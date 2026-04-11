@@ -3,182 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roulette Strategy Sniper & Simulator</title>
+    <title>Pro Double Street Sniper</title>
     <style>
-        body { font-family: sans-serif; background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .dashboard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; width: 100%; max-width: 800px; }
-        .stat-box { background: #2d2d2d; padding: 15px; border-radius: 8px; text-align: center; border-bottom: 4px solid #4CAF50; }
-        .stat-box.loss { border-color: #f44336; }
-        .stat-val { font-size: 24px; font-weight: bold; display: block; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: #e0e0e0; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; width: 100%; max-width: 900px; }
+        .stat-box { background: #1e1e1e; padding: 15px; border-radius: 8px; text-align: center; border-top: 4px solid #4CAF50; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .stat-box.loss { border-top-color: #f44336; }
+        .stat-val { font-size: 22px; font-weight: bold; display: block; color: #fff; margin-top: 5px; }
         
-        .controls { background: #333; padding: 20px; border-radius: 8px; margin-bottom: 20px; width: 100%; max-width: 800px; }
-        select, button { padding: 10px; font-size: 16px; cursor: pointer; border-radius: 4px; border: none; }
-        button { background: #4CAF50; color: white; font-weight: bold; }
+        .setup-bar { background: #2a2a2a; padding: 20px; border-radius: 8px; margin-bottom: 20px; width: 100%; max-width: 900px; display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end; }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        input, select, button { padding: 10px; border-radius: 4px; border: 1px solid #444; background: #333; color: white; font-size: 14px; }
+        button { background: #4CAF50; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
         button:hover { background: #45a049; }
 
-        .roulette-grid { display: grid; grid-template-columns: repeat(13, 1fr); gap: 5px; background: #064e3b; padding: 15px; border-radius: 10px; border: 4px solid #ffd700; margin-bottom: 20px; }
-        .cell { width: 40px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); }
-        .red { background: #e11d48; }
+        .main-container { display: flex; gap: 20px; width: 100%; max-width: 900px; flex-wrap: wrap; }
+        .roulette-grid { display: grid; grid-template-columns: repeat(13, 1fr); gap: 4px; background: #064e3b; padding: 10px; border-radius: 8px; border: 3px solid #ffd700; flex: 2; }
+        .cell { height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 3px; font-weight: bold; font-size: 14px; }
+        .red { background: #b91c1c; }
         .black { background: #18181b; }
-        .zero { background: #16a34a; grid-row: span 3; height: 160px; }
-        .cell:hover { opacity: 0.8; transform: scale(1.05); }
+        .zero { background: #15803d; grid-row: span 3; height: 100%; }
 
-        .log { background: #000; padding: 10px; height: 150px; overflow-y: auto; width: 100%; max-width: 800px; font-family: monospace; font-size: 13px; border: 1px solid #444; }
-        .green-txt { color: #4CAF50; }
-        .red-txt { color: #f44336; }
+        .sidebar { flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 15px; }
+        textarea { background: #1e1e1e; color: #4CAF50; border: 1px solid #444; padding: 10px; border-radius: 4px; resize: none; font-family: monospace; height: 100px; }
+        .log { background: #000; padding: 10px; height: 250px; overflow-y: auto; font-family: monospace; font-size: 12px; border: 1px solid #333; border-radius: 4px; }
+        .win-msg { color: #4CAF50; font-weight: bold; }
+        .loss-msg { color: #f44336; }
     </style>
 </head>
 <body>
 
-    <h2>🎰 Strategy Sniper & Simulator</h2>
+    <h2 style="color: #ffd700;">🎯 Pro Double Street Sniper</h2>
+
+    <div class="setup-bar">
+        <div class="input-group">
+            <label>Start Bankroll</label>
+            <input type="number" id="startBank" value="1000">
+        </div>
+        <div class="input-group">
+            <label>Unit Size</label>
+            <input type="number" id="unitSize" value="5">
+        </div>
+        <div class="input-group">
+            <label>Strategy</label>
+            <select id="strategySelect">
+                <option value="mirror">Mirror (Wait Middle x3)</option>
+                <option value="triangle">Triangle (Wait Even x2)</option>
+                <option value="follower">Follow Leader (Wait Color x3)</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Mode</label>
+            <select id="modeSelect">
+                <option value="manual">Manual / Paste</option>
+                <option value="sim">Simulation</option>
+            </select>
+        </div>
+        <button onclick="initGame()">Set & Reset</button>
+    </div>
 
     <div class="dashboard">
-        <div class="stat-box">Bankroll <span id="bankroll" class="stat-val">1000</span></div>
-        <div class="stat-box">Profit <span id="profit" class="stat-val">0</span></div>
+        <div class="stat-box">Current Balance <span id="curBank" class="stat-val">0</span></div>
+        <div class="stat-box">Total Profit <span id="curProfit" class="stat-val">0</span></div>
         <div class="stat-box">Peak Profit <span id="peakProfit" class="stat-val">0</span></div>
-        <div class="stat-box loss">Peak Loss <span id="peakLoss" class="stat-val">0</span></div>
+        <div class="stat-box loss">Max Drawdown <span id="peakLoss" class="stat-val">0</span></div>
     </div>
 
-    <div class="controls">
-        <label>Select Strategy:</label>
-        <select id="strategySelect">
-            <option value="mirror">1. Mirror Pattern (Wait for 13-24 x3)</option>
-            <option value="triangle">2. Triangle Strategy (Wait for Even Streets x2)</option>
-            <option value="follower">3. Follow Leader (Wait for Color x3)</option>
-        </select>
-        <button onclick="runSimulation()">Run 500 Spin Sim</button>
-        <button onclick="resetStats()" style="background:#666">Reset</button>
-    </div>
+    <div class="main-container">
+        <div class="roulette-grid" id="board">
+            </div>
 
-    <div class="roulette-grid" id="board">
+        <div class="sidebar">
+            <label>Paste Results (comma separated):</label>
+            <textarea id="pasteArea" placeholder="e.g. 14, 22, 18, 5, 31..."></textarea>
+            <button onclick="processPaste()">Process Paste Data</button>
+            <div class="log" id="log">--- System Ready ---</div>
         </div>
-
-    <div class="log" id="log">--- Click a number to track manually or Run Simulation ---</div>
+    </div>
 
 <script>
-    let bankroll = 1000;
-    let initialBankroll = 1000;
-    let peakProfit = 0;
-    let peakLoss = 0;
-    let history = [];
+    let config = { bank: 0, unit: 0, initial: 0 };
+    let stats = { peakP: 0, peakL: 0, history: [] };
+    const redNums = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
 
-    const redNumbers = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+    function initGame() {
+        config.initial = parseFloat(document.getElementById('startBank').value);
+        config.bank = config.initial;
+        config.unit = parseFloat(document.getElementById('unitSize').value);
+        stats.peakP = 0;
+        stats.peakL = 0;
+        stats.history = [];
+        
+        if(document.getElementById('modeSelect').value === 'sim') {
+            runSimulation();
+        } else {
+            updateUI();
+            addLog("System Initialized: Manual Mode", "win-msg");
+        }
+    }
 
-    // Initialize Board
+    // Build Table
     const board = document.getElementById('board');
-    let zeroCell = document.createElement('div');
-    zeroCell.className = 'cell zero';
-    zeroCell.innerText = '0';
-    zeroCell.onclick = () => recordNumber(0);
-    board.appendChild(zeroCell);
-
+    board.innerHTML = '';
+    let z = document.createElement('div');
+    z.className = 'cell zero'; z.innerText = '0';
+    z.onclick = () => recordNumber(0);
+    board.appendChild(z);
     for(let i=1; i<=36; i++) {
-        let cell = document.createElement('div');
-        let color = redNumbers.includes(i) ? 'red' : 'black';
-        cell.className = `cell ${color}`;
-        cell.innerText = i;
-        cell.onclick = () => recordNumber(i);
-        board.appendChild(cell);
+        let c = document.createElement('div');
+        c.className = `cell ${redNums.includes(i) ? 'red' : 'black'}`;
+        c.innerText = i;
+        c.onclick = () => recordNumber(i);
+        board.appendChild(c);
     }
 
     function recordNumber(num) {
-        history.push(num);
-        updateLog(`Number hit: ${num}`);
-        // Here you could trigger manual betting logic
-    }
-
-    function getDoubleStreet(num) {
-        if (num === 0) return 0;
-        return Math.ceil(num / 6);
-    }
-
-    function getColor(num) {
-        if (num === 0) return 'green';
-        return redNumbers.includes(num) ? 'red' : 'black';
-    }
-
-    function updateLog(msg, colorClass = "") {
-        const log = document.getElementById('log');
-        log.innerHTML = `<div class="${colorClass}">${msg}</div>` + log.innerHTML;
-    }
-
-    function resetStats() {
-        bankroll = 1000;
-        peakProfit = 0;
-        peakLoss = 0;
-        history = [];
+        stats.history.push(num);
+        checkStrategy(num);
         updateUI();
-        document.getElementById('log').innerHTML = "Stats Reset.";
     }
 
-    function updateUI() {
-        let currentProfit = bankroll - initialBankroll;
-        document.getElementById('bankroll').innerText = bankroll;
-        document.getElementById('profit').innerText = currentProfit;
-        if (currentProfit > peakProfit) peakProfit = currentProfit;
-        if (currentProfit < peakLoss) peakLoss = currentProfit;
-        document.getElementById('peakProfit').innerText = peakProfit;
-        document.getElementById('peakLoss').innerText = peakLoss;
+    function processPaste() {
+        let data = document.getElementById('pasteArea').value.split(/[\s,]+/);
+        data.forEach(n => {
+            if(n !== "") recordNumber(parseInt(n));
+        });
+        document.getElementById('pasteArea').value = '';
+    }
+
+    function checkStrategy(lastNum) {
+        let h = stats.history;
+        if (h.length < 4) return;
+
+        let strat = document.getElementById('strategySelect').value;
+        let trigger = false;
+        let betStreets = [];
+        let unitMult = 0;
+
+        const getDS = (n) => n === 0 ? 0 : Math.ceil(n / 6);
+        const getCol = (n) => n === 0 ? 'g' : (redNums.includes(n) ? 'r' : 'b');
+
+        if (strat === 'mirror') {
+            let last3 = h.slice(-4, -1); // Check the numbers BEFORE the current result
+            if (last3.every(n => n >= 13 && n <= 24)) {
+                trigger = true; betStreets = [1, 6]; unitMult = 2;
+            }
+        } else if (strat === 'triangle') {
+            let last2 = h.slice(-3, -1);
+            if (last2.every(n => getDS(n) % 2 === 0 && n !== 0)) {
+                trigger = true; betStreets = [1, 3, 5]; unitMult = 3;
+            }
+        } else if (strat === 'follower') {
+            let last3 = h.slice(-4, -1);
+            if (last3.every(n => getCol(n) === getCol(last3[0]) && n !== 'g')) {
+                trigger = true;
+                let prev = h[h.length-2];
+                let ds = getDS(prev);
+                betStreets = [ds, ds === 6 ? 5 : ds + 1]; unitMult = 2;
+            }
+        }
+
+        if (trigger) {
+            let cost = unitMult * config.unit;
+            config.bank -= cost;
+            let win = betStreets.includes(getDS(lastNum));
+            if (win) {
+                let gain = config.unit * 6;
+                config.bank += gain;
+                addLog(`🎯 WIN on ${lastNum}! Net: +${gain - cost}`, "win-msg");
+            } else {
+                addLog(`❌ LOSS on ${lastNum}. Net: -${cost}`, "loss-msg");
+            }
+        }
     }
 
     function runSimulation() {
-        const strat = document.getElementById('strategySelect').value;
-        updateLog(`Starting simulation for ${strat}...`, "green-txt");
-        
-        for (let i = 0; i < 500; i++) {
-            let roll = Math.floor(Math.random() * 37);
-            history.push(roll);
-
-            // Strategy Logic
-            if (history.length > 5) {
-                let last3 = history.slice(-3);
-                let last2 = history.slice(-2);
-                let trigger = false;
-                let betAmount = 0;
-                let betStreets = [];
-
-                if (strat === 'mirror') {
-                    // Trigger: Last 3 numbers were 13-24 (Street 3 or 4)
-                    if (last3.every(n => n >= 13 && n <= 24)) {
-                        trigger = true;
-                        betStreets = [1, 6]; 
-                        betAmount = 2; // 1 unit each
-                    }
-                } else if (strat === 'triangle') {
-                    // Trigger: Last 2 numbers were Even Streets (2, 4, 6)
-                    if (last2.every(n => getDoubleStreet(n) % 2 === 0 && n !== 0)) {
-                        trigger = true;
-                        betStreets = [1, 3, 5];
-                        betAmount = 3;
-                    }
-                } else if (strat === 'follower') {
-                    // Trigger: Last 3 were same color
-                    if (last3.every(n => getColor(n) === getColor(last3[0]) && n !== 0)) {
-                        trigger = true;
-                        let lastNum = history[history.length-1];
-                        let currentSt = getDoubleStreet(lastNum);
-                        let nextSt = currentSt === 6 ? 5 : currentSt + 1;
-                        betStreets = [currentSt, nextSt];
-                        betAmount = 2;
-                    }
-                }
-
-                if (trigger) {
-                    bankroll -= betAmount;
-                    let resultNum = Math.floor(Math.random() * 37);
-                    let resultStreet = getDoubleStreet(resultNum);
-                    
-                    if (betStreets.includes(resultStreet)) {
-                        bankroll += 6; // Payout 5:1 + stake
-                        updateLog(`WIN on ${resultNum}! +${6-betAmount} units`, "green-txt");
-                    } else {
-                        updateLog(`LOSS on ${resultNum}. -${betAmount} units`, "red-txt");
-                    }
-                    history.push(resultNum); // Add result to history
-                }
-            }
-            updateUI();
+        addLog("Running 500 Spin Simulation...");
+        for(let i=0; i<500; i++) {
+            let n = Math.floor(Math.random() * 37);
+            recordNumber(n);
         }
+    }
+
+    function updateUI() {
+        let p = config.bank - config.initial;
+        document.getElementById('curBank').innerText = config.bank.toFixed(2);
+        document.getElementById('curProfit').innerText = p.toFixed(2);
+        if(p > stats.peakP) stats.peakP = p;
+        if(p < stats.peakL) stats.peakL = p;
+        document.getElementById('peakProfit').innerText = stats.peakP.toFixed(2);
+        document.getElementById('peakLoss').innerText = stats.peakL.toFixed(2);
+    }
+
+    function addLog(m, cls="") {
+        let l = document.getElementById('log');
+        l.innerHTML = `<div class="${cls}">${m}</div>` + l.innerHTML;
     }
 </script>
 </body>
