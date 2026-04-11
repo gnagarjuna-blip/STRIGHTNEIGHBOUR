@@ -3,202 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Double Street Sniper</title>
+    <title>Pro Roulette Street Sniper</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: #e0e0e0; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; width: 100%; max-width: 900px; }
-        .stat-box { background: #1e1e1e; padding: 15px; border-radius: 8px; text-align: center; border-top: 4px solid #4CAF50; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .stat-box.loss { border-top-color: #f44336; }
-        .stat-val { font-size: 22px; font-weight: bold; display: block; color: #fff; margin-top: 5px; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #1a1a1a; color: #fff; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
+        .header { text-align: center; margin-bottom: 20px; }
         
-        .setup-bar { background: #2a2a2a; padding: 20px; border-radius: 8px; margin-bottom: 20px; width: 100%; max-width: 900px; display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end; }
-        .input-group { display: flex; flex-direction: column; gap: 5px; }
-        input, select, button { padding: 10px; border-radius: 4px; border: 1px solid #444; background: #333; color: white; font-size: 14px; }
-        button { background: #4CAF50; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:hover { background: #45a049; }
+        /* Stats Dashboard */
+        .stats-container { display: flex; gap: 15px; margin-bottom: 20px; width: 100%; max-width: 900px; }
+        .stat-card { background: #2a2a2a; padding: 15px; border-radius: 10px; flex: 1; text-align: center; border-bottom: 4px solid #4CAF50; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .stat-card.loss { border-bottom-color: #f44336; }
+        .stat-label { font-size: 12px; text-transform: uppercase; color: #aaa; }
+        .stat-value { font-size: 24px; font-weight: bold; display: block; margin-top: 5px; }
 
-        .main-container { display: flex; gap: 20px; width: 100%; max-width: 900px; flex-wrap: wrap; }
-        .roulette-grid { display: grid; grid-template-columns: repeat(13, 1fr); gap: 4px; background: #064e3b; padding: 10px; border-radius: 8px; border: 3px solid #ffd700; flex: 2; }
-        .cell { height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 3px; font-weight: bold; font-size: 14px; }
+        /* Setup Bar */
+        .controls { background: #333; padding: 20px; border-radius: 12px; margin-bottom: 20px; width: 100%; max-width: 900px; display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end; justify-content: space-between; }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        input, select { background: #444; color: white; border: 1px solid #555; padding: 8px; border-radius: 5px; }
+        button { background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #45a049; transform: translateY(-2px); }
+
+        /* The Physical Table Layout */
+        .table-container { display: flex; align-items: flex-start; gap: 5px; background: #064e3b; padding: 25px; border-radius: 15px; border: 6px solid #5d4037; box-shadow: inset 0 0 50px rgba(0,0,0,0.5); }
+        
+        .zero-container { display: flex; align-items: center; }
+        .cell-0 { width: 60px; height: 156px; background: #15803d; border: 1px solid #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; border-radius: 10px 0 0 10px; }
+
+        .grid-3x12 { display: grid; grid-template-columns: repeat(12, 60px); grid-template-rows: repeat(3, 50px); gap: 2px; }
+        .n-cell { border: 1px solid rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; font-size: 18px; position: relative; }
         .red { background: #b91c1c; }
         .black { background: #18181b; }
-        .zero { background: #15803d; grid-row: span 3; height: 100%; }
+        
+        /* Double Street Highlighting */
+        .street-highlight { outline: 4px solid #ffd700; outline-offset: -2px; z-index: 10; box-shadow: 0 0 20px #ffd700; background-blend-mode: overlay; }
+        .bet-chip { position: absolute; width: 25px; height: 25px; background: #ffd700; border: 2px dashed #000; border-radius: 50%; color: #000; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; z-index: 20; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
 
-        .sidebar { flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 15px; }
-        textarea { background: #1e1e1e; color: #4CAF50; border: 1px solid #444; padding: 10px; border-radius: 4px; resize: none; font-family: monospace; height: 100px; }
-        .log { background: #000; padding: 10px; height: 250px; overflow-y: auto; font-family: monospace; font-size: 12px; border: 1px solid #333; border-radius: 4px; }
-        .win-msg { color: #4CAF50; font-weight: bold; }
-        .loss-msg { color: #f44336; }
+        /* Sidebar/Logs */
+        .bottom-section { display: flex; gap: 20px; width: 100%; max-width: 950px; margin-top: 20px; }
+        .log-box { flex: 2; background: #000; height: 200px; overflow-y: auto; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 13px; border: 1px solid #444; }
+        .paste-box { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+        textarea { background: #222; color: #4CAF50; border: 1px solid #444; padding: 10px; height: 120px; border-radius: 8px; resize: none; }
+        
+        .win-txt { color: #4CAF50; }
+        .loss-txt { color: #f44336; }
+        .info-txt { color: #ffd700; }
     </style>
 </head>
 <body>
 
-    <h2 style="color: #ffd700;">🎯 Pro Double Street Sniper</h2>
+    <div class="header">
+        <h1>Roulette Street Sniper</h1>
+        <p>Wait for the trigger, then bet the highlighted Double Streets.</p>
+    </div>
 
-    <div class="setup-bar">
+    <div class="stats-container">
+        <div class="stat-card">
+            <span class="stat-label">Bankroll</span>
+            <span id="bank" class="stat-value">1000</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Profit/Loss</span>
+            <span id="profit" class="stat-value">0</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Peak</span>
+            <span id="peak" class="stat-value">0</span>
+        </div>
+        <div class="stat-card loss">
+            <span class="stat-label">Drawdown</span>
+            <span id="drawdown" class="stat-value">0</span>
+        </div>
+    </div>
+
+    <div class="controls">
         <div class="input-group">
-            <label>Start Bankroll</label>
+            <label>Initial Bankroll</label>
             <input type="number" id="startBank" value="1000">
         </div>
         <div class="input-group">
             <label>Unit Size</label>
-            <input type="number" id="unitSize" value="5">
+            <input type="number" id="unitSize" value="10">
         </div>
         <div class="input-group">
             <label>Strategy</label>
-            <select id="strategySelect">
-                <option value="mirror">Mirror (Wait Middle x3)</option>
-                <option value="triangle">Triangle (Wait Even x2)</option>
-                <option value="follower">Follow Leader (Wait Color x3)</option>
+            <select id="strat">
+                <option value="mirror">1. Mirror (Ends)</option>
+                <option value="triangle">2. Triangle (Checker)</option>
+                <option value="follower">3. Follow Leader (Wheel)</option>
             </select>
         </div>
-        <div class="input-group">
-            <label>Mode</label>
-            <select id="modeSelect">
-                <option value="manual">Manual / Paste</option>
-                <option value="sim">Simulation</option>
-            </select>
+        <button onclick="resetApp()">Set / Reset</button>
+        <button style="background: #3b82f6;" onclick="runSim()">Sim 500 Spins</button>
+    </div>
+
+    <div class="table-container">
+        <div class="zero-container">
+            <div class="cell-0" onclick="inputNumber(0)">0</div>
         </div>
-        <button onclick="initGame()">Set & Reset</button>
-    </div>
-
-    <div class="dashboard">
-        <div class="stat-box">Current Balance <span id="curBank" class="stat-val">0</span></div>
-        <div class="stat-box">Total Profit <span id="curProfit" class="stat-val">0</span></div>
-        <div class="stat-box">Peak Profit <span id="peakProfit" class="stat-val">0</span></div>
-        <div class="stat-box loss">Max Drawdown <span id="peakLoss" class="stat-val">0</span></div>
-    </div>
-
-    <div class="main-container">
-        <div class="roulette-grid" id="board">
+        <div class="grid-3x12" id="grid">
             </div>
+    </div>
 
-        <div class="sidebar">
-            <label>Paste Results (comma separated):</label>
-            <textarea id="pasteArea" placeholder="e.g. 14, 22, 18, 5, 31..."></textarea>
-            <button onclick="processPaste()">Process Paste Data</button>
-            <div class="log" id="log">--- System Ready ---</div>
+    <div class="bottom-section">
+        <div class="log-box" id="log">--- READY: Click numbers or paste history ---</div>
+        <div class="paste-box">
+            <textarea id="pasteData" placeholder="Paste history here (e.g. 1, 14, 32, 5)"></textarea>
+            <button onclick="handlePaste()">Process History</button>
         </div>
     </div>
 
 <script>
-    let config = { bank: 0, unit: 0, initial: 0 };
-    let stats = { peakP: 0, peakL: 0, history: [] };
     const redNums = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+    let bank = 1000;
+    let initial = 1000;
+    let unit = 10;
+    let history = [];
+    let peak = 0;
+    let maxDraw = 0;
 
-    function initGame() {
-        config.initial = parseFloat(document.getElementById('startBank').value);
-        config.bank = config.initial;
-        config.unit = parseFloat(document.getElementById('unitSize').value);
-        stats.peakP = 0;
-        stats.peakL = 0;
-        stats.history = [];
-        
-        if(document.getElementById('modeSelect').value === 'sim') {
-            runSimulation();
-        } else {
-            updateUI();
-            addLog("System Initialized: Manual Mode", "win-msg");
-        }
+    // Build physical layout grid (3 rows)
+    const grid = document.getElementById('grid');
+    const rows = [
+        [3,6,9,12,15,18,21,24,27,30,33,36],
+        [2,5,8,11,14,17,20,23,26,29,32,35],
+        [1,4,7,10,13,16,19,22,25,28,31,34]
+    ];
+
+    function createTable() {
+        grid.innerHTML = '';
+        rows.forEach(row => {
+            row.forEach(num => {
+                let div = document.createElement('div');
+                div.className = `n-cell ${redNums.includes(num) ? 'red' : 'black'}`;
+                div.id = `cell-${num}`;
+                div.innerText = num;
+                div.onclick = () => inputNumber(num);
+                grid.appendChild(div);
+            });
+        });
     }
 
-    // Build Table
-    const board = document.getElementById('board');
-    board.innerHTML = '';
-    let z = document.createElement('div');
-    z.className = 'cell zero'; z.innerText = '0';
-    z.onclick = () => recordNumber(0);
-    board.appendChild(z);
-    for(let i=1; i<=36; i++) {
-        let c = document.createElement('div');
-        c.className = `cell ${redNums.includes(i) ? 'red' : 'black'}`;
-        c.innerText = i;
-        c.onclick = () => recordNumber(i);
-        board.appendChild(c);
+    function resetApp() {
+        initial = parseFloat(document.getElementById('startBank').value);
+        bank = initial;
+        unit = parseFloat(document.getElementById('unitSize').value);
+        history = [];
+        peak = 0;
+        maxDraw = 0;
+        updateUI();
+        clearHighlights();
+        document.getElementById('log').innerHTML = "System Reset.";
     }
 
-    function recordNumber(num) {
-        stats.history.push(num);
-        checkStrategy(num);
+    function inputNumber(num) {
+        history.push(num);
+        checkBet(num);
         updateUI();
     }
 
-    function processPaste() {
-        let data = document.getElementById('pasteArea').value.split(/[\s,]+/);
-        data.forEach(n => {
-            if(n !== "") recordNumber(parseInt(n));
+    function getStreet(n) { return n === 0 ? 0 : Math.ceil(n / 6); }
+
+    function clearHighlights() {
+        document.querySelectorAll('.n-cell').forEach(c => {
+            c.classList.remove('street-highlight');
+            let chip = c.querySelector('.bet-chip');
+            if(chip) chip.remove();
         });
-        document.getElementById('pasteArea').value = '';
     }
 
-    function checkStrategy(lastNum) {
-        let h = stats.history;
-        if (h.length < 4) return;
-
-        let strat = document.getElementById('strategySelect').value;
-        let trigger = false;
-        let betStreets = [];
-        let unitMult = 0;
-
-        const getDS = (n) => n === 0 ? 0 : Math.ceil(n / 6);
-        const getCol = (n) => n === 0 ? 'g' : (redNums.includes(n) ? 'r' : 'b');
-
-        if (strat === 'mirror') {
-            let last3 = h.slice(-4, -1); // Check the numbers BEFORE the current result
-            if (last3.every(n => n >= 13 && n <= 24)) {
-                trigger = true; betStreets = [1, 6]; unitMult = 2;
+    function highlightStreet(streetNum) {
+        let start = (streetNum - 1) * 6 + 1;
+        let end = streetNum * 6;
+        for(let i = start; i <= end; i++) {
+            let el = document.getElementById(`cell-${i}`);
+            if(el) {
+                el.classList.add('street-highlight');
+                // Place chip only on the first number of the street for visual
+                if(i === start && !el.querySelector('.bet-chip')) {
+                    let chip = document.createElement('div');
+                    chip.className = 'bet-chip';
+                    chip.innerText = unit;
+                    el.appendChild(chip);
+                }
             }
-        } else if (strat === 'triangle') {
-            let last2 = h.slice(-3, -1);
-            if (last2.every(n => getDS(n) % 2 === 0 && n !== 0)) {
-                trigger = true; betStreets = [1, 3, 5]; unitMult = 3;
-            }
-        } else if (strat === 'follower') {
-            let last3 = h.slice(-4, -1);
-            if (last3.every(n => getCol(n) === getCol(last3[0]) && n !== 'g')) {
-                trigger = true;
-                let prev = h[h.length-2];
-                let ds = getDS(prev);
-                betStreets = [ds, ds === 6 ? 5 : ds + 1]; unitMult = 2;
+        }
+    }
+
+    function checkBet(currentNum) {
+        clearHighlights(); // Clear from previous turn
+        if (history.length < 3) return;
+
+        let strat = document.getElementById('strat').value;
+        let last3 = history.slice(-4, -1);
+        let last2 = history.slice(-3, -1);
+        let targetStreets = [];
+
+        // Logic Check
+        if(strat === 'mirror' && last3.every(n => n >= 13 && n <= 24)) {
+            targetStreets = [1, 6];
+        } else if(strat === 'triangle' && last2.every(n => getStreet(n) % 2 === 0 && n !== 0)) {
+            targetStreets = [1, 3, 5];
+        } else if(strat === 'follower') {
+            let prevCol = (n) => n === 0 ? 'g' : (redNums.includes(n) ? 'r' : 'b');
+            if(last3.every(n => prevCol(n) === prevCol(last3[0]) && n !== 0)) {
+                let ds = getStreet(history[history.length-2]);
+                targetStreets = [ds, ds === 6 ? 5 : ds + 1];
             }
         }
 
-        if (trigger) {
-            let cost = unitMult * config.unit;
-            config.bank -= cost;
-            let win = betStreets.includes(getDS(lastNum));
-            if (win) {
-                let gain = config.unit * 6;
-                config.bank += gain;
-                addLog(`🎯 WIN on ${lastNum}! Net: +${gain - cost}`, "win-msg");
+        // Apply Bet
+        if(targetStreets.length > 0) {
+            let cost = targetStreets.length * unit;
+            bank -= cost;
+            
+            // Show user where to bet NEXT
+            targetStreets.forEach(s => highlightStreet(s));
+
+            if(targetStreets.includes(getStreet(currentNum))) {
+                let win = unit * 6;
+                bank += win;
+                addLog(`✅ WIN on ${currentNum}! +${win - cost}`, "win-txt");
             } else {
-                addLog(`❌ LOSS on ${lastNum}. Net: -${cost}`, "loss-msg");
+                addLog(`❌ LOSS on ${currentNum}. -${cost}`, "loss-txt");
             }
         }
     }
 
-    function runSimulation() {
-        addLog("Running 500 Spin Simulation...");
+    function runSim() {
+        addLog("Running fast simulation...", "info-txt");
         for(let i=0; i<500; i++) {
-            let n = Math.floor(Math.random() * 37);
-            recordNumber(n);
+            inputNumber(Math.floor(Math.random() * 37));
         }
+    }
+
+    function handlePaste() {
+        let raw = document.getElementById('pasteData').value;
+        let nums = raw.split(/[\s,]+/).map(Number).filter(n => !isNaN(n));
+        nums.forEach(n => inputNumber(n));
+        document.getElementById('pasteData').value = '';
     }
 
     function updateUI() {
-        let p = config.bank - config.initial;
-        document.getElementById('curBank').innerText = config.bank.toFixed(2);
-        document.getElementById('curProfit').innerText = p.toFixed(2);
-        if(p > stats.peakP) stats.peakP = p;
-        if(p < stats.peakL) stats.peakL = p;
-        document.getElementById('peakProfit').innerText = stats.peakP.toFixed(2);
-        document.getElementById('peakLoss').innerText = stats.peakL.toFixed(2);
+        document.getElementById('bank').innerText = bank.toFixed(2);
+        let p = bank - initial;
+        document.getElementById('profit').innerText = p.toFixed(2);
+        if(p > peak) peak = p;
+        if(p < maxDraw) maxDraw = p;
+        document.getElementById('peak').innerText = peak.toFixed(2);
+        document.getElementById('drawdown').innerText = maxDraw.toFixed(2);
     }
 
-    function addLog(m, cls="") {
+    function addLog(m, cls) {
         let l = document.getElementById('log');
         l.innerHTML = `<div class="${cls}">${m}</div>` + l.innerHTML;
     }
+
+    createTable();
 </script>
 </body>
 </html>
