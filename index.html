@@ -3,59 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Double Street Sniper v3</title>
+    <title>Pro Double Street Sniper - Controlled Edition</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .stats-bar { display: flex; gap: 10px; margin-bottom: 20px; width: 100%; max-width: 950px; }
-        .stat-card { background: #1e1e1e; padding: 10px; border-radius: 8px; flex: 1; text-align: center; border: 1px solid #333; }
-        .stat-val { font-size: 20px; font-weight: bold; display: block; color: #4CAF50; }
-        .stat-val.neg { color: #f44336; }
+        
+        /* Stats Dashboard */
+        .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; width: 100%; max-width: 950px; }
+        .stat-card { background: #1e1e1e; padding: 12px; border-radius: 8px; text-align: center; border: 1px solid #333; }
+        .stat-label { font-size: 11px; text-transform: uppercase; color: #888; }
+        .stat-val { font-size: 20px; font-weight: bold; display: block; color: #4CAF50; margin-top: 5px; }
+        .stat-val.bet { color: #ffd700; }
+        .stat-val.loss-limit { color: #f44336; }
 
-        .controls { background: #252525; padding: 15px; border-radius: 10px; margin-bottom: 20px; width: 100%; max-width: 950px; display: flex; gap: 15px; align-items: flex-end; }
-        input, select, button { background: #333; color: white; border: 1px solid #444; padding: 8px; border-radius: 4px; }
-        button { background: #15803d; border: none; font-weight: bold; cursor: pointer; }
-        button:hover { background: #16a34a; }
+        /* Configuration Panel */
+        .controls { background: #252525; padding: 20px; border-radius: 12px; margin-bottom: 20px; width: 100%; max-width: 950px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; align-items: flex-end; }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        label { font-size: 12px; color: #bbb; }
+        input, select, button { background: #333; color: white; border: 1px solid #444; padding: 10px; border-radius: 6px; font-size: 14px; }
+        .btn-reset { background: #b91c1c; border: none; font-weight: bold; cursor: pointer; }
+        .btn-reset:hover { background: #dc2626; }
 
-        /* Real Table Layout */
-        .table-area { background: #064e3b; padding: 30px; border-radius: 15px; border: 8px solid #3d2b1f; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .roulette-grid { display: grid; grid-template-columns: 60px repeat(12, 60px); grid-template-rows: repeat(3, 50px); gap: 2px; }
-        .cell { border: 1px solid rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; position: relative; }
+        /* Table Layout */
+        .table-area { background: #064e3b; padding: 30px; border-radius: 20px; border: 8px solid #3d2b1f; position: relative; }
+        .roulette-grid { display: grid; grid-template-columns: 70px repeat(12, 60px); grid-template-rows: repeat(3, 50px); gap: 3px; }
+        .cell { border: 1px solid rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; position: relative; }
         .red { background: #b91c1c; }
         .black { background: #18181b; }
-        .zero { grid-row: span 3; background: #15803d; }
+        .zero { grid-row: span 3; background: #15803d; border-radius: 10px 0 0 10px; font-size: 24px; }
 
-        /* Double Street Visuals */
-        .highlight-street { box-shadow: inset 0 0 15px 5px #ffd700; border: 1px solid #ffd700; }
-        .chip { position: absolute; width: 28px; height: 28px; background: #ffd700; border: 2px dashed #000; border-radius: 50%; color: #000; 
-                display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; z-index: 100; box-shadow: 0 2px 4px #000;
-                top: -15px; right: -15px; /* Positioned at the intersection/corner */
-        }
+        /* Chips & Highlights */
+        .highlight-street { box-shadow: inset 0 0 20px 5px #ffd700; border: 2px solid #ffd700; }
+        .chip { position: absolute; width: 30px; height: 30px; background: #ffd700; border: 2px dashed #000; border-radius: 50%; color: #000; 
+                display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; z-index: 100;
+                top: -15px; right: -15px; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
 
-        .bottom-section { display: flex; gap: 15px; width: 100%; max-width: 950px; margin-top: 20px; height: 200px; }
-        .log { flex: 2; background: #000; padding: 10px; overflow-y: auto; font-family: monospace; border: 1px solid #333; }
-        .paste-area { flex: 1; display: flex; flex-direction: column; gap: 5px; }
-        textarea { background: #222; color: #4CAF50; height: 100%; border-radius: 4px; padding: 10px; border: 1px solid #444; }
+        /* History & Log Section */
+        .bottom-section { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 20px; width: 100%; max-width: 950px; margin-top: 20px; }
+        .box { background: #1e1e1e; padding: 15px; border-radius: 10px; border: 1px solid #333; height: 220px; overflow: hidden; display: flex; flex-direction: column; }
+        .box h3 { margin: 0 0 10px 0; font-size: 13px; color: #888; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .scroll-area { flex-grow: 1; overflow-y: auto; font-family: monospace; font-size: 12px; }
+        
+        .history-list { display: flex; flex-wrap: wrap; gap: 5px; }
+        .hist-item { width: 28px; height: 28px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11px; }
+        
+        textarea { width: 100%; background: #121212; color: #4CAF50; border: 1px solid #444; border-radius: 6px; padding: 8px; height: 80px; resize: none; box-sizing: border-box; }
+        .status-msg { font-weight: bold; padding: 5px; border-radius: 4px; margin-top: 10px; text-align: center; }
+        
+        .win-c { color: #4CAF50; }
+        .loss-c { color: #f44336; }
+        .lock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; z-index: 500; border-radius: 20px; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; text-align: center; }
     </style>
 </head>
 <body>
 
     <div class="stats-bar">
-        <div class="stat-card">Bankroll<span id="bank" class="stat-val">1000</span></div>
-        <div class="stat-card">Profit<span id="profit" class="stat-val">0</span></div>
-        <div class="stat-card">Current Bet<span id="curBet" class="stat-val" style="color:#ffd700">0</span></div>
-        <div class="stat-card">Progression Step<span id="step" class="stat-val">1</span></div>
+        <div class="stat-card">
+            <span class="stat-label">Current Bank</span>
+            <span id="bank" class="stat-val">1000</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Profit / Loss</span>
+            <span id="profit" class="stat-val">0</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Target Goal</span>
+            <span id="targetGoal" class="stat-val" style="color: #3b82f6;">+200</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Stop Loss</span>
+            <span id="stopLimit" class="stat-val loss-limit">-200</span>
+        </div>
     </div>
 
     <div class="controls">
-        <div style="display:flex; flex-direction:column">
+        <div class="input-group">
             <label>Initial Bankroll</label>
-            <input type="number" id="startBank" value="1000">
+            <input type="number" id="inputBank" value="1000">
         </div>
-        <div style="display:flex; flex-direction:column">
-            <label>Unit Size</label>
-            <input type="number" id="unitSize" value="5">
+        <div class="input-group">
+            <label>Base Unit</label>
+            <input type="number" id="inputUnit" value="10">
         </div>
-        <div style="display:flex; flex-direction:column">
+        <div class="input-group">
+            <label>Win Goal (+)</label>
+            <input type="number" id="inputGoal" value="200">
+        </div>
+        <div class="input-group">
+            <label>Stop Loss (-)</label>
+            <input type="number" id="inputLoss" value="200">
+        </div>
+        <div class="input-group">
             <label>Strategy</label>
             <select id="strat">
                 <option value="mirror">Mirror (Ends)</option>
@@ -63,139 +100,162 @@
                 <option value="follower">Follow Leader</option>
             </select>
         </div>
-        <button onclick="resetGame()">RESET</button>
-        <button onclick="runSim()" style="background:#2563eb">SIMULATE 200</button>
+        <button class="btn-reset" onclick="initSystem()">START / RESET</button>
     </div>
 
-    <div class="table-area">
-        <div class="roulette-grid" id="grid">
-            </div>
+    <div class="table-area" id="tableContainer">
+        <div class="lock-overlay" id="lockOverlay">SESSION ENDED</div>
+        <div class="roulette-grid" id="grid"></div>
     </div>
 
     <div class="bottom-section">
-        <div class="log" id="log">-- Sniper Active: Waiting for trigger --</div>
-        <div class="paste-area">
-            <textarea id="pasteIn" placeholder="Paste history numbers..."></textarea>
-            <button onclick="handlePaste()">Process Paste</button>
+        <div class="box">
+            <h3>Event Log</h3>
+            <div class="scroll-area" id="log">Waiting...</div>
+        </div>
+        <div class="box">
+            <h3>Roll History</h3>
+            <div class="scroll-area history-list" id="histList"></div>
+        </div>
+        <div class="box">
+            <h3>Paste Data</h3>
+            <textarea id="pasteIn" placeholder="12, 5, 22..."></textarea>
+            <button onclick="handlePaste()" style="width: 100%; margin-top: 5px; background: #15803d; border: none; cursor: pointer;">PROCESS</button>
+            <div id="sessionStatus" class="status-msg"></div>
         </div>
     </div>
 
 <script>
     const redNums = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
-    let bank = 1000, initial = 1000, unit = 5, step = 1, history = [];
-    const progression = [1, 1, 2, 4, 8, 16]; // Multipliers for recovery
+    let cfg = { bank: 1000, initial: 1000, unit: 10, goal: 200, loss: 200, step: 1, active: true };
+    let history = [];
+    const progression = [1, 1, 2, 4, 8, 16];
 
-    function buildTable() {
+    function buildGrid() {
         const grid = document.getElementById('grid');
-        grid.innerHTML = '<div class="cell zero" onclick="inputNum(0)">0</div>';
-        const rows = [[3,6,9,12,15,18,21,24,27,30,33,36], [2,5,8,11,14,17,20,23,26,29,32,35], [1,4,7,10,13,16,19,22,25,28,31,34]];
+        grid.innerHTML = '<div class="cell zero" onclick="clickNum(0)">0</div>';
+        const rows = [[3,6,9,12,15,18,21,24,27,30,33,36],[2,5,8,11,14,17,20,23,26,29,32,35],[1,4,7,10,13,16,19,22,25,28,31,34]];
         rows.forEach(row => {
             row.forEach(n => {
-                let color = redNums.includes(n) ? 'red' : 'black';
-                grid.innerHTML += `<div class="cell ${color}" id="c${n}" onclick="inputNum(${n})">${n}</div>`;
+                let c = redNums.includes(n) ? 'red' : 'black';
+                grid.innerHTML += `<div class="cell ${c}" id="c${n}" onclick="clickNum(${n})">${n}</div>`;
             });
         });
     }
 
-    function resetGame() {
-        initial = parseFloat(document.getElementById('startBank').value);
-        bank = initial; unit = parseFloat(document.getElementById('unitSize').value);
-        step = 1; history = [];
-        updateUI(); addLog("System Reset", "yellow");
-        clearTable();
+    function initSystem() {
+        cfg.initial = parseFloat(document.getElementById('inputBank').value);
+        cfg.bank = cfg.initial;
+        cfg.unit = parseFloat(document.getElementById('inputUnit').value);
+        cfg.goal = parseFloat(document.getElementById('inputGoal').value);
+        cfg.loss = parseFloat(document.getElementById('inputLoss').value);
+        cfg.step = 1; cfg.active = true; history = [];
+        
+        document.getElementById('lockOverlay').style.display = 'none';
+        document.getElementById('histList').innerHTML = '';
+        document.getElementById('log').innerHTML = "System Started.";
+        document.getElementById('sessionStatus').innerHTML = "";
+        updateUI(); clearTable();
     }
 
-    function inputNum(n) {
+    function clickNum(n) {
+        if (!cfg.active) return;
         history.push(n);
-        processLogic(n);
+        addHistUI(n);
+        runLogic(n);
         updateUI();
+        checkLimits();
     }
 
-    function processLogic(currentRoll) {
+    function runLogic(roll) {
         clearTable();
         if (history.length < 4) return;
-
         let strat = document.getElementById('strat').value;
         let last3 = history.slice(-4, -1);
         let last2 = history.slice(-3, -1);
-        let betStreets = [];
+        let streets = [];
 
-        // Check Triggers
-        if(strat === 'mirror' && last3.every(x => x >= 13 && x <= 24)) betStreets = [1, 6];
-        else if(strat === 'triangle' && last2.every(x => Math.ceil(x/6) % 2 === 0 && x !== 0)) betStreets = [1, 3, 5];
+        if(strat === 'mirror' && last3.every(x => x >= 13 && x <= 24)) streets = [1, 6];
+        else if(strat === 'triangle' && last2.every(x => Math.ceil(x/6) % 2 === 0 && x !== 0)) streets = [1, 3, 5];
         else if(strat === 'follower') {
-            let lastColor = redNums.includes(history[history.length-2]) ? 'r' : 'b';
-            if(last3.every(x => (redNums.includes(x) ? 'r' : 'b') === lastColor && x !== 0)) {
+            let col = (n) => n===0?'g':(redNums.includes(n)?'r':'b');
+            if(last3.every(x => col(x) === col(last3[0]) && x !== 0)) {
                 let ds = Math.ceil(history[history.length-2]/6);
-                betStreets = [ds, ds === 6 ? 5 : ds+1];
+                streets = [ds, ds === 6 ? 5 : ds+1];
             }
         }
 
-        if (betStreets.length > 0) {
-            let betAmount = betStreets.length * (unit * progression[step-1]);
-            document.getElementById('curBet').innerText = betAmount;
-            bank -= betAmount;
-
-            // Highlight and place chip on the "Double Street Line"
-            betStreets.forEach(s => placeStreetChip(s, unit * progression[step-1]));
-
-            let win = betStreets.includes(Math.ceil(currentRoll/6)) && currentRoll !== 0;
-            if (win) {
-                let payout = (unit * progression[step-1]) * 6;
-                bank += payout;
-                addLog(`WIN ${currentRoll}! +${payout - betAmount}`, "#4CAF50");
-                step = 1; // Reset progression
+        if (streets.length > 0) {
+            let bet = streets.length * (cfg.unit * progression[cfg.step-1]);
+            cfg.bank -= bet;
+            streets.forEach(s => drawChip(s, cfg.unit * progression[cfg.step-1]));
+            if (streets.includes(Math.ceil(roll/6)) && roll !== 0) {
+                let win = (cfg.unit * progression[cfg.step-1]) * 6;
+                cfg.bank += win;
+                logMsg(`WIN ${roll}! +${win - bet}`, "win-c");
+                cfg.step = 1;
             } else {
-                addLog(`LOSS ${currentRoll}. -${betAmount}`, "#f44336");
-                step = (step < progression.length) ? step + 1 : 1; // Increment progression
+                logMsg(`LOSS ${roll}. -${bet}`, "loss-c");
+                cfg.step = (cfg.step < progression.length) ? cfg.step + 1 : 1;
             }
-        } else {
-            document.getElementById('curBet').innerText = 0;
         }
     }
 
-    function placeStreetChip(street, val) {
-        let lastNumOfStreet = street * 6;
-        // Find cell on the top row of that street to place chip on the intersection
-        let anchorCell = document.getElementById(`c${lastNumOfStreet}`);
-        anchorCell.classList.add('highlight-street');
-        // Visually highlight all 6 numbers in the street
-        for(let i=(street*6)-5; i<=street*6; i++) {
-            document.getElementById(`c${i}`).classList.add('highlight-street');
+    function checkLimits() {
+        let p = cfg.bank - cfg.initial;
+        if (p >= cfg.goal) {
+            endSession("GOAL REACHED! 🏆", "#4CAF50");
+        } else if (p <= (cfg.loss * -1)) {
+            endSession("STOP LOSS HIT 🛑", "#f44336");
         }
-        anchorCell.innerHTML += `<div class="chip">${val}</div>`;
+    }
+
+    function endSession(txt, color) {
+        cfg.active = false;
+        document.getElementById('lockOverlay').style.display = 'flex';
+        document.getElementById('lockOverlay').innerText = txt;
+        document.getElementById('sessionStatus').innerText = txt;
+        document.getElementById('sessionStatus').style.color = color;
+    }
+
+    function drawChip(st, val) {
+        let last = st * 6;
+        for(let i=(st*6)-5; i<=st*6; i++) document.getElementById(`c${i}`).classList.add('highlight-street');
+        document.getElementById(`c${last}`).innerHTML += `<div class="chip">${val}</div>`;
     }
 
     function clearTable() {
         document.querySelectorAll('.cell').forEach(c => {
             c.classList.remove('highlight-street');
-            let chip = c.querySelector('.chip');
-            if(chip) chip.remove();
+            let chip = c.querySelector('.chip'); if(chip) chip.remove();
         });
     }
 
     function updateUI() {
-        document.getElementById('bank').innerText = bank;
-        document.getElementById('profit').innerText = bank - initial;
-        document.getElementById('step').innerText = step;
+        document.getElementById('bank').innerText = cfg.bank.toFixed(2);
+        document.getElementById('profit').innerText = (cfg.bank - cfg.initial).toFixed(2);
+        document.getElementById('targetGoal').innerText = "+" + cfg.goal;
+        document.getElementById('stopLimit').innerText = "-" + cfg.loss;
     }
 
-    function addLog(m, color) {
-        let l = document.getElementById('log');
-        l.innerHTML = `<div style="color:${color}">${m}</div>` + l.innerHTML;
+    function addHistUI(n) {
+        const list = document.getElementById('histList');
+        let c = n === 0 ? '#15803d' : (redNums.includes(n) ? '#b91c1c' : '#18181b');
+        list.innerHTML = `<div class="hist-item" style="background:${c}">${n}</div>` + list.innerHTML;
+    }
+
+    function logMsg(m, cl) {
+        const l = document.getElementById('log');
+        l.innerHTML = `<div class="${cl}">${m}</div>` + l.innerHTML;
     }
 
     function handlePaste() {
         let nums = document.getElementById('pasteIn').value.split(/[\s,]+/).map(Number);
-        nums.forEach(n => { if(!isNaN(n)) inputNum(n); });
+        nums.forEach(n => { if(!isNaN(n) && cfg.active) clickNum(n); });
         document.getElementById('pasteIn').value = '';
     }
 
-    function runSim() {
-        for(let i=0; i<200; i++) inputNum(Math.floor(Math.random() * 37));
-    }
-
-    buildTable();
+    buildGrid();
 </script>
 </body>
 </html>
