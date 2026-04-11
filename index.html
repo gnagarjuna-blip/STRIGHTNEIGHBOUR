@@ -3,261 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Roulette Street Sniper</title>
+    <title>Pro Double Street Sniper v3</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #1a1a1a; color: #fff; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
-        .header { text-align: center; margin-bottom: 20px; }
-        
-        /* Stats Dashboard */
-        .stats-container { display: flex; gap: 15px; margin-bottom: 20px; width: 100%; max-width: 900px; }
-        .stat-card { background: #2a2a2a; padding: 15px; border-radius: 10px; flex: 1; text-align: center; border-bottom: 4px solid #4CAF50; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .stat-card.loss { border-bottom-color: #f44336; }
-        .stat-label { font-size: 12px; text-transform: uppercase; color: #aaa; }
-        .stat-value { font-size: 24px; font-weight: bold; display: block; margin-top: 5px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .stats-bar { display: flex; gap: 10px; margin-bottom: 20px; width: 100%; max-width: 950px; }
+        .stat-card { background: #1e1e1e; padding: 10px; border-radius: 8px; flex: 1; text-align: center; border: 1px solid #333; }
+        .stat-val { font-size: 20px; font-weight: bold; display: block; color: #4CAF50; }
+        .stat-val.neg { color: #f44336; }
 
-        /* Setup Bar */
-        .controls { background: #333; padding: 20px; border-radius: 12px; margin-bottom: 20px; width: 100%; max-width: 900px; display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end; justify-content: space-between; }
-        .input-group { display: flex; flex-direction: column; gap: 5px; }
-        input, select { background: #444; color: white; border: 1px solid #555; padding: 8px; border-radius: 5px; }
-        button { background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #45a049; transform: translateY(-2px); }
+        .controls { background: #252525; padding: 15px; border-radius: 10px; margin-bottom: 20px; width: 100%; max-width: 950px; display: flex; gap: 15px; align-items: flex-end; }
+        input, select, button { background: #333; color: white; border: 1px solid #444; padding: 8px; border-radius: 4px; }
+        button { background: #15803d; border: none; font-weight: bold; cursor: pointer; }
+        button:hover { background: #16a34a; }
 
-        /* The Physical Table Layout */
-        .table-container { display: flex; align-items: flex-start; gap: 5px; background: #064e3b; padding: 25px; border-radius: 15px; border: 6px solid #5d4037; box-shadow: inset 0 0 50px rgba(0,0,0,0.5); }
-        
-        .zero-container { display: flex; align-items: center; }
-        .cell-0 { width: 60px; height: 156px; background: #15803d; border: 1px solid #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; border-radius: 10px 0 0 10px; }
-
-        .grid-3x12 { display: grid; grid-template-columns: repeat(12, 60px); grid-template-rows: repeat(3, 50px); gap: 2px; }
-        .n-cell { border: 1px solid rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; font-size: 18px; position: relative; }
+        /* Real Table Layout */
+        .table-area { background: #064e3b; padding: 30px; border-radius: 15px; border: 8px solid #3d2b1f; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .roulette-grid { display: grid; grid-template-columns: 60px repeat(12, 60px); grid-template-rows: repeat(3, 50px); gap: 2px; }
+        .cell { border: 1px solid rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; position: relative; }
         .red { background: #b91c1c; }
         .black { background: #18181b; }
-        
-        /* Double Street Highlighting */
-        .street-highlight { outline: 4px solid #ffd700; outline-offset: -2px; z-index: 10; box-shadow: 0 0 20px #ffd700; background-blend-mode: overlay; }
-        .bet-chip { position: absolute; width: 25px; height: 25px; background: #ffd700; border: 2px dashed #000; border-radius: 50%; color: #000; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; z-index: 20; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        .zero { grid-row: span 3; background: #15803d; }
 
-        /* Sidebar/Logs */
-        .bottom-section { display: flex; gap: 20px; width: 100%; max-width: 950px; margin-top: 20px; }
-        .log-box { flex: 2; background: #000; height: 200px; overflow-y: auto; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 13px; border: 1px solid #444; }
-        .paste-box { flex: 1; display: flex; flex-direction: column; gap: 10px; }
-        textarea { background: #222; color: #4CAF50; border: 1px solid #444; padding: 10px; height: 120px; border-radius: 8px; resize: none; }
-        
-        .win-txt { color: #4CAF50; }
-        .loss-txt { color: #f44336; }
-        .info-txt { color: #ffd700; }
+        /* Double Street Visuals */
+        .highlight-street { box-shadow: inset 0 0 15px 5px #ffd700; border: 1px solid #ffd700; }
+        .chip { position: absolute; width: 28px; height: 28px; background: #ffd700; border: 2px dashed #000; border-radius: 50%; color: #000; 
+                display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; z-index: 100; box-shadow: 0 2px 4px #000;
+                top: -15px; right: -15px; /* Positioned at the intersection/corner */
+        }
+
+        .bottom-section { display: flex; gap: 15px; width: 100%; max-width: 950px; margin-top: 20px; height: 200px; }
+        .log { flex: 2; background: #000; padding: 10px; overflow-y: auto; font-family: monospace; border: 1px solid #333; }
+        .paste-area { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+        textarea { background: #222; color: #4CAF50; height: 100%; border-radius: 4px; padding: 10px; border: 1px solid #444; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>Roulette Street Sniper</h1>
-        <p>Wait for the trigger, then bet the highlighted Double Streets.</p>
-    </div>
-
-    <div class="stats-container">
-        <div class="stat-card">
-            <span class="stat-label">Bankroll</span>
-            <span id="bank" class="stat-value">1000</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label">Profit/Loss</span>
-            <span id="profit" class="stat-value">0</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label">Peak</span>
-            <span id="peak" class="stat-value">0</span>
-        </div>
-        <div class="stat-card loss">
-            <span class="stat-label">Drawdown</span>
-            <span id="drawdown" class="stat-value">0</span>
-        </div>
+    <div class="stats-bar">
+        <div class="stat-card">Bankroll<span id="bank" class="stat-val">1000</span></div>
+        <div class="stat-card">Profit<span id="profit" class="stat-val">0</span></div>
+        <div class="stat-card">Current Bet<span id="curBet" class="stat-val" style="color:#ffd700">0</span></div>
+        <div class="stat-card">Progression Step<span id="step" class="stat-val">1</span></div>
     </div>
 
     <div class="controls">
-        <div class="input-group">
+        <div style="display:flex; flex-direction:column">
             <label>Initial Bankroll</label>
             <input type="number" id="startBank" value="1000">
         </div>
-        <div class="input-group">
+        <div style="display:flex; flex-direction:column">
             <label>Unit Size</label>
-            <input type="number" id="unitSize" value="10">
+            <input type="number" id="unitSize" value="5">
         </div>
-        <div class="input-group">
+        <div style="display:flex; flex-direction:column">
             <label>Strategy</label>
             <select id="strat">
-                <option value="mirror">1. Mirror (Ends)</option>
-                <option value="triangle">2. Triangle (Checker)</option>
-                <option value="follower">3. Follow Leader (Wheel)</option>
+                <option value="mirror">Mirror (Ends)</option>
+                <option value="triangle">Triangle (Checker)</option>
+                <option value="follower">Follow Leader</option>
             </select>
         </div>
-        <button onclick="resetApp()">Set / Reset</button>
-        <button style="background: #3b82f6;" onclick="runSim()">Sim 500 Spins</button>
+        <button onclick="resetGame()">RESET</button>
+        <button onclick="runSim()" style="background:#2563eb">SIMULATE 200</button>
     </div>
 
-    <div class="table-container">
-        <div class="zero-container">
-            <div class="cell-0" onclick="inputNumber(0)">0</div>
-        </div>
-        <div class="grid-3x12" id="grid">
+    <div class="table-area">
+        <div class="roulette-grid" id="grid">
             </div>
     </div>
 
     <div class="bottom-section">
-        <div class="log-box" id="log">--- READY: Click numbers or paste history ---</div>
-        <div class="paste-box">
-            <textarea id="pasteData" placeholder="Paste history here (e.g. 1, 14, 32, 5)"></textarea>
-            <button onclick="handlePaste()">Process History</button>
+        <div class="log" id="log">-- Sniper Active: Waiting for trigger --</div>
+        <div class="paste-area">
+            <textarea id="pasteIn" placeholder="Paste history numbers..."></textarea>
+            <button onclick="handlePaste()">Process Paste</button>
         </div>
     </div>
 
 <script>
     const redNums = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
-    let bank = 1000;
-    let initial = 1000;
-    let unit = 10;
-    let history = [];
-    let peak = 0;
-    let maxDraw = 0;
+    let bank = 1000, initial = 1000, unit = 5, step = 1, history = [];
+    const progression = [1, 1, 2, 4, 8, 16]; // Multipliers for recovery
 
-    // Build physical layout grid (3 rows)
-    const grid = document.getElementById('grid');
-    const rows = [
-        [3,6,9,12,15,18,21,24,27,30,33,36],
-        [2,5,8,11,14,17,20,23,26,29,32,35],
-        [1,4,7,10,13,16,19,22,25,28,31,34]
-    ];
-
-    function createTable() {
-        grid.innerHTML = '';
+    function buildTable() {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '<div class="cell zero" onclick="inputNum(0)">0</div>';
+        const rows = [[3,6,9,12,15,18,21,24,27,30,33,36], [2,5,8,11,14,17,20,23,26,29,32,35], [1,4,7,10,13,16,19,22,25,28,31,34]];
         rows.forEach(row => {
-            row.forEach(num => {
-                let div = document.createElement('div');
-                div.className = `n-cell ${redNums.includes(num) ? 'red' : 'black'}`;
-                div.id = `cell-${num}`;
-                div.innerText = num;
-                div.onclick = () => inputNumber(num);
-                grid.appendChild(div);
+            row.forEach(n => {
+                let color = redNums.includes(n) ? 'red' : 'black';
+                grid.innerHTML += `<div class="cell ${color}" id="c${n}" onclick="inputNum(${n})">${n}</div>`;
             });
         });
     }
 
-    function resetApp() {
+    function resetGame() {
         initial = parseFloat(document.getElementById('startBank').value);
-        bank = initial;
-        unit = parseFloat(document.getElementById('unitSize').value);
-        history = [];
-        peak = 0;
-        maxDraw = 0;
-        updateUI();
-        clearHighlights();
-        document.getElementById('log').innerHTML = "System Reset.";
+        bank = initial; unit = parseFloat(document.getElementById('unitSize').value);
+        step = 1; history = [];
+        updateUI(); addLog("System Reset", "yellow");
+        clearTable();
     }
 
-    function inputNumber(num) {
-        history.push(num);
-        checkBet(num);
+    function inputNum(n) {
+        history.push(n);
+        processLogic(n);
         updateUI();
     }
 
-    function getStreet(n) { return n === 0 ? 0 : Math.ceil(n / 6); }
-
-    function clearHighlights() {
-        document.querySelectorAll('.n-cell').forEach(c => {
-            c.classList.remove('street-highlight');
-            let chip = c.querySelector('.bet-chip');
-            if(chip) chip.remove();
-        });
-    }
-
-    function highlightStreet(streetNum) {
-        let start = (streetNum - 1) * 6 + 1;
-        let end = streetNum * 6;
-        for(let i = start; i <= end; i++) {
-            let el = document.getElementById(`cell-${i}`);
-            if(el) {
-                el.classList.add('street-highlight');
-                // Place chip only on the first number of the street for visual
-                if(i === start && !el.querySelector('.bet-chip')) {
-                    let chip = document.createElement('div');
-                    chip.className = 'bet-chip';
-                    chip.innerText = unit;
-                    el.appendChild(chip);
-                }
-            }
-        }
-    }
-
-    function checkBet(currentNum) {
-        clearHighlights(); // Clear from previous turn
-        if (history.length < 3) return;
+    function processLogic(currentRoll) {
+        clearTable();
+        if (history.length < 4) return;
 
         let strat = document.getElementById('strat').value;
         let last3 = history.slice(-4, -1);
         let last2 = history.slice(-3, -1);
-        let targetStreets = [];
+        let betStreets = [];
 
-        // Logic Check
-        if(strat === 'mirror' && last3.every(n => n >= 13 && n <= 24)) {
-            targetStreets = [1, 6];
-        } else if(strat === 'triangle' && last2.every(n => getStreet(n) % 2 === 0 && n !== 0)) {
-            targetStreets = [1, 3, 5];
-        } else if(strat === 'follower') {
-            let prevCol = (n) => n === 0 ? 'g' : (redNums.includes(n) ? 'r' : 'b');
-            if(last3.every(n => prevCol(n) === prevCol(last3[0]) && n !== 0)) {
-                let ds = getStreet(history[history.length-2]);
-                targetStreets = [ds, ds === 6 ? 5 : ds + 1];
+        // Check Triggers
+        if(strat === 'mirror' && last3.every(x => x >= 13 && x <= 24)) betStreets = [1, 6];
+        else if(strat === 'triangle' && last2.every(x => Math.ceil(x/6) % 2 === 0 && x !== 0)) betStreets = [1, 3, 5];
+        else if(strat === 'follower') {
+            let lastColor = redNums.includes(history[history.length-2]) ? 'r' : 'b';
+            if(last3.every(x => (redNums.includes(x) ? 'r' : 'b') === lastColor && x !== 0)) {
+                let ds = Math.ceil(history[history.length-2]/6);
+                betStreets = [ds, ds === 6 ? 5 : ds+1];
             }
         }
 
-        // Apply Bet
-        if(targetStreets.length > 0) {
-            let cost = targetStreets.length * unit;
-            bank -= cost;
-            
-            // Show user where to bet NEXT
-            targetStreets.forEach(s => highlightStreet(s));
+        if (betStreets.length > 0) {
+            let betAmount = betStreets.length * (unit * progression[step-1]);
+            document.getElementById('curBet').innerText = betAmount;
+            bank -= betAmount;
 
-            if(targetStreets.includes(getStreet(currentNum))) {
-                let win = unit * 6;
-                bank += win;
-                addLog(`✅ WIN on ${currentNum}! +${win - cost}`, "win-txt");
+            // Highlight and place chip on the "Double Street Line"
+            betStreets.forEach(s => placeStreetChip(s, unit * progression[step-1]));
+
+            let win = betStreets.includes(Math.ceil(currentRoll/6)) && currentRoll !== 0;
+            if (win) {
+                let payout = (unit * progression[step-1]) * 6;
+                bank += payout;
+                addLog(`WIN ${currentRoll}! +${payout - betAmount}`, "#4CAF50");
+                step = 1; // Reset progression
             } else {
-                addLog(`❌ LOSS on ${currentNum}. -${cost}`, "loss-txt");
+                addLog(`LOSS ${currentRoll}. -${betAmount}`, "#f44336");
+                step = (step < progression.length) ? step + 1 : 1; // Increment progression
             }
+        } else {
+            document.getElementById('curBet').innerText = 0;
         }
     }
 
-    function runSim() {
-        addLog("Running fast simulation...", "info-txt");
-        for(let i=0; i<500; i++) {
-            inputNumber(Math.floor(Math.random() * 37));
+    function placeStreetChip(street, val) {
+        let lastNumOfStreet = street * 6;
+        // Find cell on the top row of that street to place chip on the intersection
+        let anchorCell = document.getElementById(`c${lastNumOfStreet}`);
+        anchorCell.classList.add('highlight-street');
+        // Visually highlight all 6 numbers in the street
+        for(let i=(street*6)-5; i<=street*6; i++) {
+            document.getElementById(`c${i}`).classList.add('highlight-street');
         }
+        anchorCell.innerHTML += `<div class="chip">${val}</div>`;
     }
 
-    function handlePaste() {
-        let raw = document.getElementById('pasteData').value;
-        let nums = raw.split(/[\s,]+/).map(Number).filter(n => !isNaN(n));
-        nums.forEach(n => inputNumber(n));
-        document.getElementById('pasteData').value = '';
+    function clearTable() {
+        document.querySelectorAll('.cell').forEach(c => {
+            c.classList.remove('highlight-street');
+            let chip = c.querySelector('.chip');
+            if(chip) chip.remove();
+        });
     }
 
     function updateUI() {
-        document.getElementById('bank').innerText = bank.toFixed(2);
-        let p = bank - initial;
-        document.getElementById('profit').innerText = p.toFixed(2);
-        if(p > peak) peak = p;
-        if(p < maxDraw) maxDraw = p;
-        document.getElementById('peak').innerText = peak.toFixed(2);
-        document.getElementById('drawdown').innerText = maxDraw.toFixed(2);
+        document.getElementById('bank').innerText = bank;
+        document.getElementById('profit').innerText = bank - initial;
+        document.getElementById('step').innerText = step;
     }
 
-    function addLog(m, cls) {
+    function addLog(m, color) {
         let l = document.getElementById('log');
-        l.innerHTML = `<div class="${cls}">${m}</div>` + l.innerHTML;
+        l.innerHTML = `<div style="color:${color}">${m}</div>` + l.innerHTML;
     }
 
-    createTable();
+    function handlePaste() {
+        let nums = document.getElementById('pasteIn').value.split(/[\s,]+/).map(Number);
+        nums.forEach(n => { if(!isNaN(n)) inputNum(n); });
+        document.getElementById('pasteIn').value = '';
+    }
+
+    function runSim() {
+        for(let i=0; i<200; i++) inputNum(Math.floor(Math.random() * 37));
+    }
+
+    buildTable();
 </script>
 </body>
 </html>
