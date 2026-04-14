@@ -3,222 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Coldest Double Street Tracker</title>
+    <title>Roulette Coldest DS Pro</title>
     <style>
-        :root { 
-            --green: #1b5e20; --red: #d32f2f; --black: #1a1a1a; 
-            --gold: #ffc107; --blue: #2196f3;
-        }
-
-        body { 
-            font-family: -apple-system, sans-serif; 
-            background: #121212; color: white; margin: 0; padding: 10px; 
-        }
-
-        input {
-            -webkit-user-select: text !important;
-            user-select: text !important;
-            cursor: text;
-        }
-
-        .header { 
-            display: flex; flex-wrap: wrap; gap: 10px; 
-            background: #2c3e50; padding: 15px; border-radius: 8px; margin-bottom: 10px; 
-        }
-
-        .input-group { flex: 1 1 140px; display: flex; flex-direction: column; }
+        :root { --green: #1b5e20; --red: #d32f2f; --black: #1a1a1a; --gold: #ffc107; --blue: #2196f3; }
+        body { font-family: -apple-system, sans-serif; background: #121212; color: white; margin: 0; padding: 10px; }
+        .header, .sim-section { background: #2c3e50; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
+        .input-group { flex: 1 1 140px; display: flex; flex-direction: column; margin-bottom: 10px; }
         .input-group label { font-size: 0.8rem; margin-bottom: 4px; color: var(--gold); }
-        
-        .header input { 
-            padding: 15px; border-radius: 4px; border: 2px solid #555; 
-            background: white; color: black; font-weight: bold; font-size: 1.2rem; 
-        }
-
+        input, textarea { padding: 12px; border-radius: 4px; border: 2px solid #555; background: white; color: black; font-weight: bold; }
         .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 10px; }
-        .stat-card { background: #34495e; padding: 10px; border-radius: 6px; text-align: center; }
-        .stat-card div { font-size: 1.2rem; color: var(--gold); font-weight: bold; }
-
-        .table-scroll-container {
-            overflow-x: auto; background: var(--green); padding: 15px; 
-            border: 4px solid #3e2723; border-radius: 12px;
-            -webkit-overflow-scrolling: touch; margin-bottom: 10px;
-        }
-
-        .roulette-grid { 
-            display: grid; 
-            grid-template-columns: 80px repeat(12, 65px);
-            grid-template-rows: 60px 60px 60px 50px;
-            gap: 4px; min-width: 880px;
-        }
-
-        .cell { 
-            display: flex; align-items: center; justify-content: center; 
-            font-weight: bold; cursor: pointer; border: 1px solid rgba(255,255,255,0.4); 
-            font-size: 1.4rem; border-radius: 4px;
-        }
-
+        .stat-card { background: #34495e; padding: 10px; border-radius: 6px; text-align: center; font-size: 0.8rem; }
+        .stat-card div { font-size: 1.1rem; color: var(--gold); font-weight: bold; }
+        .table-scroll-container { overflow-x: auto; background: var(--green); padding: 15px; border: 4px solid #3e2723; border-radius: 12px; margin-bottom: 10px; }
+        .roulette-grid { display: grid; grid-template-columns: 80px repeat(12, 65px); grid-template-rows: 60px 60px 60px 50px; gap: 4px; min-width: 880px; }
+        .cell { display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; border: 1px solid rgba(255,255,255,0.4); font-size: 1.4rem; border-radius: 4px; }
         .zero { grid-row: 1 / span 3; background: var(--green); border: 3px solid white; }
-        .r { background: var(--red); }
-        .b { background: var(--black); }
-
-        .physical-chip {
-            width: 44px; height: 44px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.9rem; font-weight: 900; color: white;
-            border: 3px dashed rgba(255,255,255,0.8);
-            background: #2980b9; justify-self: center; align-self: center;
-        }
+        .r { background: var(--red); } .b { background: var(--black); }
+        .physical-chip { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 900; color: white; border: 3px dashed white; background: #2980b9; justify-self: center; align-self: center; }
         .chip-low { background: #c0392b; }
-
-        .btn { padding: 18px; border: none; border-radius: 4px; font-weight: bold; text-transform: uppercase; font-size: 1rem; }
+        .btn { padding: 15px; border: none; border-radius: 4px; font-weight: bold; text-transform: uppercase; cursor: pointer; }
+        textarea { width: 100%; box-sizing: border-box; font-family: monospace; resize: vertical; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <div class="input-group">
-            <label>Bankroll ($)</label>
-            <input type="number" id="inBank" value="1000">
+        <div style="display:flex; gap:10px;">
+            <div class="input-group">
+                <label>Bankroll ($)</label>
+                <input type="number" id="inBank" value="1000">
+            </div>
+            <div class="input-group">
+                <label>Base Unit ($)</label>
+                <input type="number" id="inUnit" value="20">
+            </div>
         </div>
-        <div class="input-group">
-            <label>Base Unit ($)</label>
-            <input type="number" id="inUnit" value="5">
-        </div>
-        <button class="btn" style="background:var(--gold); width:100%; margin-top:10px; color:black;" onclick="startSession()">
-            Apply & Start Session
-        </button>
+        <button class="btn" style="background:var(--gold); width:100%; color:black;" onclick="startSession()">Apply & Start Session</button>
     </div>
 
     <div class="stats">
         <div class="stat-card">Bank<div id="dispBank">1000</div></div>
         <div class="stat-card">P/L<div id="dispProfit">0</div></div>
-        <div class="stat-card">L|H Units<div id="dispUnits">1 | 1</div></div>
+        <div class="stat-card">L | H Bet<div id="dispUnits">20 | 20</div></div>
         <div class="stat-card">Peak<div id="dispPeak">1000</div></div>
     </div>
 
     <div class="table-scroll-container">
         <div class="roulette-grid" id="grid">
             <div class="cell zero" onclick="press(0)">0</div>
-            <div class="cell r" onclick="press(3)">3</div><div class="cell b" onclick="press(6)">6</div>
-            <div class="cell r" onclick="press(9)">9</div><div class="cell r" onclick="press(12)">12</div>
-            <div class="cell b" onclick="press(15)">15</div><div class="cell r" onclick="press(18)">18</div>
-            <div class="cell r" onclick="press(21)">21</div><div class="cell b" onclick="press(24)">24</div>
-            <div class="cell r" onclick="press(27)">27</div><div class="cell r" onclick="press(30)">30</div>
-            <div class="cell b" onclick="press(33)">33</div><div class="cell r" onclick="press(36)">36</div>
-            <div class="cell b" onclick="press(2)" style="grid-column: 2">2</div>
-            <div class="cell r" onclick="press(5)">5</div><div class="cell b" onclick="press(8)">8</div>
-            <div class="cell b" onclick="press(11)">11</div><div class="cell r" onclick="press(14)">14</div>
-            <div class="cell b" onclick="press(17)">17</div><div class="cell b" onclick="press(20)">20</div>
-            <div class="cell r" onclick="press(23)">23</div><div class="cell b" onclick="press(26)">26</div>
-            <div class="cell b" onclick="press(29)">29</div><div class="cell r" onclick="press(32)">32</div>
-            <div class="cell b" onclick="press(35)">35</div>
-            <div class="cell r" onclick="press(1)" style="grid-column: 2">1</div>
-            <div class="cell b" onclick="press(4)">4</div><div class="cell r" onclick="press(7)">7</div>
-            <div class="cell b" onclick="press(10)">10</div><div class="cell b" onclick="press(13)">13</div>
-            <div class="cell r" onclick="press(16)">16</div><div class="cell r" onclick="press(19)">19</div>
-            <div class="cell b" onclick="press(22)">22</div><div class="cell r" onclick="press(25)">25</div>
-            <div class="cell b" onclick="press(28)">28</div><div class="cell b" onclick="press(31)">31</div>
-            <div class="cell r" onclick="press(34)">34</div>
+            <div class="cell r" onclick="press(3)">3</div><div class="cell b" onclick="press(6)">6</div><div class="cell r" onclick="press(9)">9</div><div class="cell r" onclick="press(12)">12</div><div class="cell b" onclick="press(15)">15</div><div class="cell r" onclick="press(18)">18</div><div class="cell r" onclick="press(21)">21</div><div class="cell b" onclick="press(24)">24</div><div class="cell r" onclick="press(27)">27</div><div class="cell r" onclick="press(30)">30</div><div class="cell b" onclick="press(33)">33</div><div class="cell r" onclick="press(36)">36</div>
+            <div class="cell b" onclick="press(2)" style="grid-column: 2">2</div><div class="cell r" onclick="press(5)">5</div><div class="cell b" onclick="press(8)">8</div><div class="cell b" onclick="press(11)">11</div><div class="cell r" onclick="press(14)">14</div><div class="cell b" onclick="press(17)">17</div><div class="cell b" onclick="press(20)">20</div><div class="cell r" onclick="press(23)">23</div><div class="cell b" onclick="press(26)">26</div><div class="cell b" onclick="press(29)">29</div><div class="cell r" onclick="press(32)">32</div><div class="cell b" onclick="press(35)">35</div>
+            <div class="cell r" onclick="press(1)" style="grid-column: 2">1</div><div class="cell b" onclick="press(4)">4</div><div class="cell r" onclick="press(7)">7</div><div class="cell b" onclick="press(10)">10</div><div class="cell b" onclick="press(13)">13</div><div class="cell r" onclick="press(16)">16</div><div class="cell r" onclick="press(19)">19</div><div class="cell b" onclick="press(22)">22</div><div class="cell r" onclick="press(25)">25</div><div class="cell b" onclick="press(28)">28</div><div class="cell b" onclick="press(31)">31</div><div class="cell r" onclick="press(34)">34</div>
         </div>
     </div>
 
-    <div id="advice" style="background:#444; padding:15px; text-align:center; border-radius:5px; font-weight:bold;">
-        Set Bank/Unit and press Start
+    <div id="advice" style="background:#444; padding:15px; text-align:center; border-radius:5px; font-weight:bold; margin-bottom:10px;">
+        WAITING FOR DATA
     </div>
 
-    <div style="display:flex; gap:10px; margin-top:10px;">
+    <div class="sim-section">
+        <label style="color:var(--gold); font-size:0.8rem;">SIMULATION (Paste 200-1000 numbers)</label>
+        <textarea id="simData" rows="3" placeholder="Example: 5, 12, 33, 0, 21..."></textarea>
+        <button class="btn" style="background:var(--blue); width:100%; margin-top:10px; color:white;" onclick="runSimulation()">Run Full Simulation</button>
+        <div id="simResults" style="margin-top:10px; font-size:0.85rem; color:#bdc3c7; line-height:1.4;"></div>
+    </div>
+
+    <div style="display:flex; gap:10px;">
         <button class="btn" style="background:#e67e22; flex:1" onclick="undo()">Undo</button>
         <button class="btn" style="background:#7f8c8d; flex:1" onclick="location.reload()">Reset</button>
     </div>
 
-    <div id="log" style="height:120px; overflow-y:auto; background:#1a1a1a; padding:10px; margin-top:10px; font-family:monospace; font-size:0.9rem;"></div>
+    <div id="log" style="height:150px; overflow-y:auto; background:#1a1a1a; padding:10px; margin-top:10px; font-family:monospace; font-size:0.8rem; border:1px solid #333;"></div>
 </div>
 
 <script>
-    let bank=1000, startBank=1000, peak=1000, history=[], base=5, active=false;
-    let unitLow=1, unitHigh=1, currentPrediction=null;
-    let lossCountLow=0, lossCountHigh=0;
+    let bank=1000, startBank=1000, peak=1000, history=[], base=20, active=false;
+    let progLow=1, progHigh=1, lossLow=0, lossHigh=0, currentPrediction=null;
     let states = [];
 
     function startSession() {
         startBank = parseFloat(document.getElementById('inBank').value) || 1000;
-        base = parseFloat(document.getElementById('inUnit').value) || 5;
-        bank = startBank; peak = bank; active = true;
-        document.getElementById('advice').innerText = "Enter 18 spins to identify Coldest Double Streets";
-        updateUI();
-    }
-
-    function saveState() {
-        states.push(JSON.stringify({bank, unitLow, unitHigh, lossCountLow, lossCountHigh, history: [...history], currentPrediction}));
-    }
-
-    function undo() {
-        if(states.length === 0) return;
-        let s = JSON.parse(states.pop());
-        bank = s.bank; unitLow = s.unitLow; unitHigh = s.unitHigh; 
-        lossCountLow = s.lossCountLow; lossCountHigh = s.lossCountHigh;
-        history = s.history; currentPrediction = s.currentPrediction;
+        base = parseFloat(document.getElementById('inUnit').value) || 20;
+        bank = startBank; peak = bank; progLow = 1; progHigh = 1; lossLow = 0; lossHigh = 0;
+        active = true; history = [];
+        document.getElementById('log').innerHTML = "Session Started...";
         updateUI();
     }
 
     function press(n) {
         if(!active) return;
         saveState();
+        processSpin(n);
+        updateUI(n);
+    }
 
+    function processSpin(n) {
         if(currentPrediction) {
-            // Deduct bets for both coldest DS
-            bank -= (base * unitLow) + (base * unitHigh);
+            // Deduct Bets (Progression * Base)
+            bank -= (progLow * base) + (progHigh * base);
             let ds = Math.ceil(n / 6);
-            
-            // Logic for Low Side (DS 1-3)
-            if(n > 0 && currentPrediction.lowDS === ds) {
-                bank += (base * unitLow * 6);
-                unitLow = Math.max(1, unitLow - 2);
-                lossCountLow = 0;
+
+            // Side 1 (Low 1-18)
+            if(n > 0 && n <= 18 && ds === currentPrediction.lowDS) {
+                bank += (progLow * base * 6);
+                progLow = Math.max(1, progLow - 2);
+                lossLow = 0;
             } else {
-                lossCountLow++;
-                if(lossCountLow === 2) { unitLow += 1; lossCountLow = 0; }
+                lossLow++;
+                if(lossLow >= 2) { progLow += 1; lossLow = 0; }
             }
 
-            // Logic for High Side (DS 4-6)
-            if(n >= 19 && currentPrediction.highDS === ds) {
-                bank += (base * unitHigh * 6);
-                unitHigh = Math.max(1, unitHigh - 2);
-                lossCountHigh = 0;
+            // Side 2 (High 19-36)
+            if(n >= 19 && ds === currentPrediction.highDS) {
+                bank += (progHigh * base * 6);
+                progHigh = Math.max(1, progHigh - 2);
+                lossHigh = 0;
             } else {
-                lossCountHigh++;
-                if(lossCountHigh === 2) { unitHigh += 1; lossCountHigh = 0; }
+                lossHigh++;
+                if(lossHigh >= 2) { progHigh += 1; lossHigh = 0; }
             }
         }
 
         history.push(n);
-        
-        // Always recalculate coldest based on last 18
         if(history.length >= 18) {
             const last18 = history.slice(-18);
             const freq = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0};
             last18.forEach(x => { if(x > 0) freq[Math.ceil(x/6)]++; });
             
-            // Sort by frequency (ascending) to find coldest
-            const lowSorted = [1,2,3].sort((a,b) => freq[a] - freq[b]);
-            const highSorted = [4,5,6].sort((a,b) => freq[a] - freq[b]);
-            
-            currentPrediction = { 
-                lowDS: lowSorted[0], 
-                highDS: highSorted[0] 
-            };
+            const lowSet = [1,2,3].sort((a,b) => freq[a] - freq[b]);
+            const highSet = [4,5,6].sort((a,b) => freq[a] - freq[b]);
+            currentPrediction = { lowDS: lowSet[0], highDS: highSet[0] };
         }
-        updateUI(n);
+    }
+
+    function runSimulation() {
+        const raw = document.getElementById('simData').value;
+        const nums = raw.split(/[\s,]+/).filter(x => x !== "").map(Number);
+        if(nums.length < 19) { alert("Need at least 19 numbers for sim"); return; }
+
+        // Reset Sim variables
+        let sBank = parseFloat(document.getElementById('inBank').value);
+        let sBase = parseFloat(document.getElementById('inUnit').value);
+        let sProgL = 1, sProgH = 1, sLossL = 0, sLossH = 0;
+        let sPeak = sBank, sMaxDD = 0, sWinCount = 0, sBetCount = 0;
+        let sHistory = [];
+        let sPred = null;
+
+        nums.forEach(n => {
+            if(sPred) {
+                sBetCount++;
+                sBank -= (sProgL * sBase) + (sProgH * sBase);
+                let ds = Math.ceil(n/6);
+                let hit = false;
+                if(n > 0 && n <= 18 && ds === sPred.lowDS) { sBank += (sProgL * sBase * 6); sProgL = Math.max(1, sProgL - 2); sLossL = 0; hit=true; }
+                else { sLossL++; if(sLossL >= 2){ sProgL++; sLossL=0; } }
+                
+                if(n >= 19 && ds === sPred.highDS) { sBank += (sProgH * sBase * 6); sProgH = Math.max(1, sProgH - 2); sLossH = 0; hit=true; }
+                else { sLossH++; if(sLossH >= 2){ sProgH++; sLossH=0; } }
+                if(hit) sWinCount++;
+            }
+            sHistory.push(n);
+            if(sHistory.length >= 18) {
+                const last18 = sHistory.slice(-18);
+                const freq = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0};
+                last18.forEach(x => { if(x > 0) freq[Math.ceil(x/6)]++; });
+                const lS = [1,2,3].sort((a,b) => freq[a] - freq[b]);
+                const hS = [4,5,6].sort((a,b) => freq[a] - freq[b]);
+                sPred = { lowDS: lS[0], highDS: hS[0] };
+            }
+            if(sBank > sPeak) sPeak = sBank;
+            let dd = sPeak - sBank;
+            if(dd > sMaxDD) sMaxDD = dd;
+        });
+
+        document.getElementById('simResults').innerHTML = `
+            <b>Final Bank:</b> $${Math.floor(sBank)}<br>
+            <b>Max Profit:</b> $${Math.floor(sPeak - parseFloat(document.getElementById('inBank').value))}<br>
+            <b>Max Drawdown:</b> <span style="color:#e74c3c">$${Math.floor(sMaxDD)}</span><br>
+            <b>Win Rate:</b> ${((sWinCount/sBetCount)*100).toFixed(1)}% (${sWinCount} hits)
+        `;
+    }
+
+    function saveState() {
+        states.push(JSON.stringify({bank, progLow, progHigh, lossLow, lossHigh, history: [...history], currentPrediction}));
+    }
+
+    function undo() {
+        if(states.length === 0) return;
+        let s = JSON.parse(states.pop());
+        bank = s.bank; progLow = s.progLow; progHigh = s.progHigh;
+        lossLow = s.lossLow; lossHigh = s.lossHigh;
+        history = s.history; currentPrediction = s.currentPrediction;
+        updateUI();
     }
 
     function updateUI(n) {
         document.getElementById('dispBank').innerText = Math.floor(bank);
         document.getElementById('dispProfit').innerText = Math.floor(bank - startBank);
-        document.getElementById('dispUnits').innerText = `${unitLow} | ${unitHigh}`;
+        document.getElementById('dispUnits').innerText = `${progLow * base} | ${progHigh * base}`;
         if(bank > peak) peak = bank;
         document.getElementById('dispPeak').innerText = Math.floor(peak);
-
         document.querySelectorAll('.physical-chip').forEach(c => c.remove());
 
         if(currentPrediction) {
@@ -226,22 +211,22 @@
             const place = (ds, val, type) => {
                 const chip = document.createElement('div');
                 chip.className = `physical-chip ${type === 'low' ? 'chip-low' : ''}`;
-                chip.innerText = val;
-                // Place chip visually under the double street
+                chip.innerText = `$${val * base}`;
                 chip.style.gridColumn = `${((ds-1)*2)+2} / span 2`;
                 chip.style.gridRow = "4";
                 grid.appendChild(chip);
             };
-            place(currentPrediction.lowDS, unitLow, 'low');
-            place(currentPrediction.highDS, unitHigh, 'high');
-            document.getElementById('advice').innerText = `BET COLDEST: DS${currentPrediction.lowDS} & DS${currentPrediction.highDS}`;
+            place(currentPrediction.lowDS, progLow, 'low');
+            place(currentPrediction.highDS, progHigh, 'high');
+            document.getElementById('advice').innerText = "BETS ACTIVE";
             document.getElementById('advice').style.background = "var(--blue)";
+        } else {
+            document.getElementById('advice').innerText = `SPINS NEEDED: ${18 - history.length}`;
         }
 
         if(n !== undefined) {
             const entry = document.createElement('div');
-            entry.style.borderBottom = "1px solid #333";
-            entry.innerHTML = `Spin ${history.length}: <b>${n}</b> | Bank: ${Math.floor(bank)} | Units: ${unitLow},${unitHigh}`;
+            entry.innerHTML = `Spin ${history.length}: <b>${n}</b> | Bank: ${Math.floor(bank)}`;
             document.getElementById('log').prepend(entry);
         }
     }
