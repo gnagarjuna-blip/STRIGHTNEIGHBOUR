@@ -2,260 +2,249 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Double Street Sniper - Controlled Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Coldest Double Street Tracker</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        
-        /* Stats Dashboard */
-        .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; width: 100%; max-width: 950px; }
-        .stat-card { background: #1e1e1e; padding: 12px; border-radius: 8px; text-align: center; border: 1px solid #333; }
-        .stat-label { font-size: 11px; text-transform: uppercase; color: #888; }
-        .stat-val { font-size: 20px; font-weight: bold; display: block; color: #4CAF50; margin-top: 5px; }
-        .stat-val.bet { color: #ffd700; }
-        .stat-val.loss-limit { color: #f44336; }
+        :root { 
+            --green: #1b5e20; --red: #d32f2f; --black: #1a1a1a; 
+            --gold: #ffc107; --blue: #2196f3;
+        }
 
-        /* Configuration Panel */
-        .controls { background: #252525; padding: 20px; border-radius: 12px; margin-bottom: 20px; width: 100%; max-width: 950px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; align-items: flex-end; }
-        .input-group { display: flex; flex-direction: column; gap: 5px; }
-        label { font-size: 12px; color: #bbb; }
-        input, select, button { background: #333; color: white; border: 1px solid #444; padding: 10px; border-radius: 6px; font-size: 14px; }
-        .btn-reset { background: #b91c1c; border: none; font-weight: bold; cursor: pointer; }
-        .btn-reset:hover { background: #dc2626; }
+        body { 
+            font-family: -apple-system, sans-serif; 
+            background: #121212; color: white; margin: 0; padding: 10px; 
+        }
 
-        /* Table Layout */
-        .table-area { background: #064e3b; padding: 30px; border-radius: 20px; border: 8px solid #3d2b1f; position: relative; }
-        .roulette-grid { display: grid; grid-template-columns: 70px repeat(12, 60px); grid-template-rows: repeat(3, 50px); gap: 3px; }
-        .cell { border: 1px solid rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; position: relative; }
-        .red { background: #b91c1c; }
-        .black { background: #18181b; }
-        .zero { grid-row: span 3; background: #15803d; border-radius: 10px 0 0 10px; font-size: 24px; }
+        input {
+            -webkit-user-select: text !important;
+            user-select: text !important;
+            cursor: text;
+        }
 
-        /* Chips & Highlights */
-        .highlight-street { box-shadow: inset 0 0 20px 5px #ffd700; border: 2px solid #ffd700; }
-        .chip { position: absolute; width: 30px; height: 30px; background: #ffd700; border: 2px dashed #000; border-radius: 50%; color: #000; 
-                display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; z-index: 100;
-                top: -15px; right: -15px; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
+        .header { 
+            display: flex; flex-wrap: wrap; gap: 10px; 
+            background: #2c3e50; padding: 15px; border-radius: 8px; margin-bottom: 10px; 
+        }
 
-        /* History & Log Section */
-        .bottom-section { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 20px; width: 100%; max-width: 950px; margin-top: 20px; }
-        .box { background: #1e1e1e; padding: 15px; border-radius: 10px; border: 1px solid #333; height: 220px; overflow: hidden; display: flex; flex-direction: column; }
-        .box h3 { margin: 0 0 10px 0; font-size: 13px; color: #888; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 5px; }
-        .scroll-area { flex-grow: 1; overflow-y: auto; font-family: monospace; font-size: 12px; }
+        .input-group { flex: 1 1 140px; display: flex; flex-direction: column; }
+        .input-group label { font-size: 0.8rem; margin-bottom: 4px; color: var(--gold); }
         
-        .history-list { display: flex; flex-wrap: wrap; gap: 5px; }
-        .hist-item { width: 28px; height: 28px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11px; }
-        
-        textarea { width: 100%; background: #121212; color: #4CAF50; border: 1px solid #444; border-radius: 6px; padding: 8px; height: 80px; resize: none; box-sizing: border-box; }
-        .status-msg { font-weight: bold; padding: 5px; border-radius: 4px; margin-top: 10px; text-align: center; }
-        
-        .win-c { color: #4CAF50; }
-        .loss-c { color: #f44336; }
-        .lock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; z-index: 500; border-radius: 20px; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; text-align: center; }
+        .header input { 
+            padding: 15px; border-radius: 4px; border: 2px solid #555; 
+            background: white; color: black; font-weight: bold; font-size: 1.2rem; 
+        }
+
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 10px; }
+        .stat-card { background: #34495e; padding: 10px; border-radius: 6px; text-align: center; }
+        .stat-card div { font-size: 1.2rem; color: var(--gold); font-weight: bold; }
+
+        .table-scroll-container {
+            overflow-x: auto; background: var(--green); padding: 15px; 
+            border: 4px solid #3e2723; border-radius: 12px;
+            -webkit-overflow-scrolling: touch; margin-bottom: 10px;
+        }
+
+        .roulette-grid { 
+            display: grid; 
+            grid-template-columns: 80px repeat(12, 65px);
+            grid-template-rows: 60px 60px 60px 50px;
+            gap: 4px; min-width: 880px;
+        }
+
+        .cell { 
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: bold; cursor: pointer; border: 1px solid rgba(255,255,255,0.4); 
+            font-size: 1.4rem; border-radius: 4px;
+        }
+
+        .zero { grid-row: 1 / span 3; background: var(--green); border: 3px solid white; }
+        .r { background: var(--red); }
+        .b { background: var(--black); }
+
+        .physical-chip {
+            width: 44px; height: 44px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem; font-weight: 900; color: white;
+            border: 3px dashed rgba(255,255,255,0.8);
+            background: #2980b9; justify-self: center; align-self: center;
+        }
+        .chip-low { background: #c0392b; }
+
+        .btn { padding: 18px; border: none; border-radius: 4px; font-weight: bold; text-transform: uppercase; font-size: 1rem; }
     </style>
 </head>
 <body>
 
-    <div class="stats-bar">
-        <div class="stat-card">
-            <span class="stat-label">Current Bank</span>
-            <span id="bank" class="stat-val">1000</span>
+<div class="container">
+    <div class="header">
+        <div class="input-group">
+            <label>Bankroll ($)</label>
+            <input type="number" id="inBank" value="1000">
         </div>
-        <div class="stat-card">
-            <span class="stat-label">Profit / Loss</span>
-            <span id="profit" class="stat-val">0</span>
+        <div class="input-group">
+            <label>Base Unit ($)</label>
+            <input type="number" id="inUnit" value="5">
         </div>
-        <div class="stat-card">
-            <span class="stat-label">Target Goal</span>
-            <span id="targetGoal" class="stat-val" style="color: #3b82f6;">+200</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label">Stop Loss</span>
-            <span id="stopLimit" class="stat-val loss-limit">-200</span>
+        <button class="btn" style="background:var(--gold); width:100%; margin-top:10px; color:black;" onclick="startSession()">
+            Apply & Start Session
+        </button>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">Bank<div id="dispBank">1000</div></div>
+        <div class="stat-card">P/L<div id="dispProfit">0</div></div>
+        <div class="stat-card">L|H Units<div id="dispUnits">1 | 1</div></div>
+        <div class="stat-card">Peak<div id="dispPeak">1000</div></div>
+    </div>
+
+    <div class="table-scroll-container">
+        <div class="roulette-grid" id="grid">
+            <div class="cell zero" onclick="press(0)">0</div>
+            <div class="cell r" onclick="press(3)">3</div><div class="cell b" onclick="press(6)">6</div>
+            <div class="cell r" onclick="press(9)">9</div><div class="cell r" onclick="press(12)">12</div>
+            <div class="cell b" onclick="press(15)">15</div><div class="cell r" onclick="press(18)">18</div>
+            <div class="cell r" onclick="press(21)">21</div><div class="cell b" onclick="press(24)">24</div>
+            <div class="cell r" onclick="press(27)">27</div><div class="cell r" onclick="press(30)">30</div>
+            <div class="cell b" onclick="press(33)">33</div><div class="cell r" onclick="press(36)">36</div>
+            <div class="cell b" onclick="press(2)" style="grid-column: 2">2</div>
+            <div class="cell r" onclick="press(5)">5</div><div class="cell b" onclick="press(8)">8</div>
+            <div class="cell b" onclick="press(11)">11</div><div class="cell r" onclick="press(14)">14</div>
+            <div class="cell b" onclick="press(17)">17</div><div class="cell b" onclick="press(20)">20</div>
+            <div class="cell r" onclick="press(23)">23</div><div class="cell b" onclick="press(26)">26</div>
+            <div class="cell b" onclick="press(29)">29</div><div class="cell r" onclick="press(32)">32</div>
+            <div class="cell b" onclick="press(35)">35</div>
+            <div class="cell r" onclick="press(1)" style="grid-column: 2">1</div>
+            <div class="cell b" onclick="press(4)">4</div><div class="cell r" onclick="press(7)">7</div>
+            <div class="cell b" onclick="press(10)">10</div><div class="cell b" onclick="press(13)">13</div>
+            <div class="cell r" onclick="press(16)">16</div><div class="cell r" onclick="press(19)">19</div>
+            <div class="cell b" onclick="press(22)">22</div><div class="cell r" onclick="press(25)">25</div>
+            <div class="cell b" onclick="press(28)">28</div><div class="cell b" onclick="press(31)">31</div>
+            <div class="cell r" onclick="press(34)">34</div>
         </div>
     </div>
 
-    <div class="controls">
-        <div class="input-group">
-            <label>Initial Bankroll</label>
-            <input type="number" id="inputBank" value="1000">
-        </div>
-        <div class="input-group">
-            <label>Base Unit</label>
-            <input type="number" id="inputUnit" value="10">
-        </div>
-        <div class="input-group">
-            <label>Win Goal (+)</label>
-            <input type="number" id="inputGoal" value="200">
-        </div>
-        <div class="input-group">
-            <label>Stop Loss (-)</label>
-            <input type="number" id="inputLoss" value="200">
-        </div>
-        <div class="input-group">
-            <label>Strategy</label>
-            <select id="strat">
-                <option value="mirror">Mirror (Ends)</option>
-                <option value="triangle">Triangle (Checker)</option>
-                <option value="follower">Follow Leader</option>
-            </select>
-        </div>
-        <button class="btn-reset" onclick="initSystem()">START / RESET</button>
+    <div id="advice" style="background:#444; padding:15px; text-align:center; border-radius:5px; font-weight:bold;">
+        Set Bank/Unit and press Start
     </div>
 
-    <div class="table-area" id="tableContainer">
-        <div class="lock-overlay" id="lockOverlay">SESSION ENDED</div>
-        <div class="roulette-grid" id="grid"></div>
+    <div style="display:flex; gap:10px; margin-top:10px;">
+        <button class="btn" style="background:#e67e22; flex:1" onclick="undo()">Undo</button>
+        <button class="btn" style="background:#7f8c8d; flex:1" onclick="location.reload()">Reset</button>
     </div>
 
-    <div class="bottom-section">
-        <div class="box">
-            <h3>Event Log</h3>
-            <div class="scroll-area" id="log">Waiting...</div>
-        </div>
-        <div class="box">
-            <h3>Roll History</h3>
-            <div class="scroll-area history-list" id="histList"></div>
-        </div>
-        <div class="box">
-            <h3>Paste Data</h3>
-            <textarea id="pasteIn" placeholder="12, 5, 22..."></textarea>
-            <button onclick="handlePaste()" style="width: 100%; margin-top: 5px; background: #15803d; border: none; cursor: pointer;">PROCESS</button>
-            <div id="sessionStatus" class="status-msg"></div>
-        </div>
-    </div>
+    <div id="log" style="height:120px; overflow-y:auto; background:#1a1a1a; padding:10px; margin-top:10px; font-family:monospace; font-size:0.9rem;"></div>
+</div>
 
 <script>
-    const redNums = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
-    let cfg = { bank: 1000, initial: 1000, unit: 10, goal: 200, loss: 200, step: 1, active: true };
-    let history = [];
-    const progression = [1, 1, 2, 4, 8, 16];
+    let bank=1000, startBank=1000, peak=1000, history=[], base=5, active=false;
+    let unitLow=1, unitHigh=1, currentPrediction=null;
+    let lossCountLow=0, lossCountHigh=0;
+    let states = [];
 
-    function buildGrid() {
-        const grid = document.getElementById('grid');
-        grid.innerHTML = '<div class="cell zero" onclick="clickNum(0)">0</div>';
-        const rows = [[3,6,9,12,15,18,21,24,27,30,33,36],[2,5,8,11,14,17,20,23,26,29,32,35],[1,4,7,10,13,16,19,22,25,28,31,34]];
-        rows.forEach(row => {
-            row.forEach(n => {
-                let c = redNums.includes(n) ? 'red' : 'black';
-                grid.innerHTML += `<div class="cell ${c}" id="c${n}" onclick="clickNum(${n})">${n}</div>`;
-            });
-        });
-    }
-
-    function initSystem() {
-        cfg.initial = parseFloat(document.getElementById('inputBank').value);
-        cfg.bank = cfg.initial;
-        cfg.unit = parseFloat(document.getElementById('inputUnit').value);
-        cfg.goal = parseFloat(document.getElementById('inputGoal').value);
-        cfg.loss = parseFloat(document.getElementById('inputLoss').value);
-        cfg.step = 1; cfg.active = true; history = [];
-        
-        document.getElementById('lockOverlay').style.display = 'none';
-        document.getElementById('histList').innerHTML = '';
-        document.getElementById('log').innerHTML = "System Started.";
-        document.getElementById('sessionStatus').innerHTML = "";
-        updateUI(); clearTable();
-    }
-
-    function clickNum(n) {
-        if (!cfg.active) return;
-        history.push(n);
-        addHistUI(n);
-        runLogic(n);
+    function startSession() {
+        startBank = parseFloat(document.getElementById('inBank').value) || 1000;
+        base = parseFloat(document.getElementById('inUnit').value) || 5;
+        bank = startBank; peak = bank; active = true;
+        document.getElementById('advice').innerText = "Enter 18 spins to identify Coldest Double Streets";
         updateUI();
-        checkLimits();
     }
 
-    function runLogic(roll) {
-        clearTable();
-        if (history.length < 4) return;
-        let strat = document.getElementById('strat').value;
-        let last3 = history.slice(-4, -1);
-        let last2 = history.slice(-3, -1);
-        let streets = [];
+    function saveState() {
+        states.push(JSON.stringify({bank, unitLow, unitHigh, lossCountLow, lossCountHigh, history: [...history], currentPrediction}));
+    }
 
-        if(strat === 'mirror' && last3.every(x => x >= 13 && x <= 24)) streets = [1, 6];
-        else if(strat === 'triangle' && last2.every(x => Math.ceil(x/6) % 2 === 0 && x !== 0)) streets = [1, 3, 5];
-        else if(strat === 'follower') {
-            let col = (n) => n===0?'g':(redNums.includes(n)?'r':'b');
-            if(last3.every(x => col(x) === col(last3[0]) && x !== 0)) {
-                let ds = Math.ceil(history[history.length-2]/6);
-                streets = [ds, ds === 6 ? 5 : ds+1];
-            }
-        }
+    function undo() {
+        if(states.length === 0) return;
+        let s = JSON.parse(states.pop());
+        bank = s.bank; unitLow = s.unitLow; unitHigh = s.unitHigh; 
+        lossCountLow = s.lossCountLow; lossCountHigh = s.lossCountHigh;
+        history = s.history; currentPrediction = s.currentPrediction;
+        updateUI();
+    }
 
-        if (streets.length > 0) {
-            let bet = streets.length * (cfg.unit * progression[cfg.step-1]);
-            cfg.bank -= bet;
-            streets.forEach(s => drawChip(s, cfg.unit * progression[cfg.step-1]));
-            if (streets.includes(Math.ceil(roll/6)) && roll !== 0) {
-                let win = (cfg.unit * progression[cfg.step-1]) * 6;
-                cfg.bank += win;
-                logMsg(`WIN ${roll}! +${win - bet}`, "win-c");
-                cfg.step = 1;
+    function press(n) {
+        if(!active) return;
+        saveState();
+
+        if(currentPrediction) {
+            // Deduct bets for both coldest DS
+            bank -= (base * unitLow) + (base * unitHigh);
+            let ds = Math.ceil(n / 6);
+            
+            // Logic for Low Side (DS 1-3)
+            if(n > 0 && currentPrediction.lowDS === ds) {
+                bank += (base * unitLow * 6);
+                unitLow = Math.max(1, unitLow - 2);
+                lossCountLow = 0;
             } else {
-                logMsg(`LOSS ${roll}. -${bet}`, "loss-c");
-                cfg.step = (cfg.step < progression.length) ? cfg.step + 1 : 1;
+                lossCountLow++;
+                if(lossCountLow === 2) { unitLow += 1; lossCountLow = 0; }
+            }
+
+            // Logic for High Side (DS 4-6)
+            if(n >= 19 && currentPrediction.highDS === ds) {
+                bank += (base * unitHigh * 6);
+                unitHigh = Math.max(1, unitHigh - 2);
+                lossCountHigh = 0;
+            } else {
+                lossCountHigh++;
+                if(lossCountHigh === 2) { unitHigh += 1; lossCountHigh = 0; }
             }
         }
+
+        history.push(n);
+        
+        // Always recalculate coldest based on last 18
+        if(history.length >= 18) {
+            const last18 = history.slice(-18);
+            const freq = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0};
+            last18.forEach(x => { if(x > 0) freq[Math.ceil(x/6)]++; });
+            
+            // Sort by frequency (ascending) to find coldest
+            const lowSorted = [1,2,3].sort((a,b) => freq[a] - freq[b]);
+            const highSorted = [4,5,6].sort((a,b) => freq[a] - freq[b]);
+            
+            currentPrediction = { 
+                lowDS: lowSorted[0], 
+                highDS: highSorted[0] 
+            };
+        }
+        updateUI(n);
     }
 
-    function checkLimits() {
-        let p = cfg.bank - cfg.initial;
-        if (p >= cfg.goal) {
-            endSession("GOAL REACHED! 🏆", "#4CAF50");
-        } else if (p <= (cfg.loss * -1)) {
-            endSession("STOP LOSS HIT 🛑", "#f44336");
+    function updateUI(n) {
+        document.getElementById('dispBank').innerText = Math.floor(bank);
+        document.getElementById('dispProfit').innerText = Math.floor(bank - startBank);
+        document.getElementById('dispUnits').innerText = `${unitLow} | ${unitHigh}`;
+        if(bank > peak) peak = bank;
+        document.getElementById('dispPeak').innerText = Math.floor(peak);
+
+        document.querySelectorAll('.physical-chip').forEach(c => c.remove());
+
+        if(currentPrediction) {
+            const grid = document.getElementById('grid');
+            const place = (ds, val, type) => {
+                const chip = document.createElement('div');
+                chip.className = `physical-chip ${type === 'low' ? 'chip-low' : ''}`;
+                chip.innerText = val;
+                // Place chip visually under the double street
+                chip.style.gridColumn = `${((ds-1)*2)+2} / span 2`;
+                chip.style.gridRow = "4";
+                grid.appendChild(chip);
+            };
+            place(currentPrediction.lowDS, unitLow, 'low');
+            place(currentPrediction.highDS, unitHigh, 'high');
+            document.getElementById('advice').innerText = `BET COLDEST: DS${currentPrediction.lowDS} & DS${currentPrediction.highDS}`;
+            document.getElementById('advice').style.background = "var(--blue)";
+        }
+
+        if(n !== undefined) {
+            const entry = document.createElement('div');
+            entry.style.borderBottom = "1px solid #333";
+            entry.innerHTML = `Spin ${history.length}: <b>${n}</b> | Bank: ${Math.floor(bank)} | Units: ${unitLow},${unitHigh}`;
+            document.getElementById('log').prepend(entry);
         }
     }
-
-    function endSession(txt, color) {
-        cfg.active = false;
-        document.getElementById('lockOverlay').style.display = 'flex';
-        document.getElementById('lockOverlay').innerText = txt;
-        document.getElementById('sessionStatus').innerText = txt;
-        document.getElementById('sessionStatus').style.color = color;
-    }
-
-    function drawChip(st, val) {
-        let last = st * 6;
-        for(let i=(st*6)-5; i<=st*6; i++) document.getElementById(`c${i}`).classList.add('highlight-street');
-        document.getElementById(`c${last}`).innerHTML += `<div class="chip">${val}</div>`;
-    }
-
-    function clearTable() {
-        document.querySelectorAll('.cell').forEach(c => {
-            c.classList.remove('highlight-street');
-            let chip = c.querySelector('.chip'); if(chip) chip.remove();
-        });
-    }
-
-    function updateUI() {
-        document.getElementById('bank').innerText = cfg.bank.toFixed(2);
-        document.getElementById('profit').innerText = (cfg.bank - cfg.initial).toFixed(2);
-        document.getElementById('targetGoal').innerText = "+" + cfg.goal;
-        document.getElementById('stopLimit').innerText = "-" + cfg.loss;
-    }
-
-    function addHistUI(n) {
-        const list = document.getElementById('histList');
-        let c = n === 0 ? '#15803d' : (redNums.includes(n) ? '#b91c1c' : '#18181b');
-        list.innerHTML = `<div class="hist-item" style="background:${c}">${n}</div>` + list.innerHTML;
-    }
-
-    function logMsg(m, cl) {
-        const l = document.getElementById('log');
-        l.innerHTML = `<div class="${cl}">${m}</div>` + l.innerHTML;
-    }
-
-    function handlePaste() {
-        let nums = document.getElementById('pasteIn').value.split(/[\s,]+/).map(Number);
-        nums.forEach(n => { if(!isNaN(n) && cfg.active) clickNum(n); });
-        document.getElementById('pasteIn').value = '';
-    }
-
-    buildGrid();
 </script>
 </body>
 </html>
