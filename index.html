@@ -32,7 +32,7 @@
         <div style="display:flex; gap:10px;">
             <div class="input-group">
                 <label>Bankroll ($)</label>
-                <input type="number" id="inBank" value="1000">
+                <input type="number" id="inBank" value="5000">
             </div>
             <div class="input-group">
                 <label>Base Unit ($)</label>
@@ -43,10 +43,10 @@
     </div>
 
     <div class="stats">
-        <div class="stat-card">Bank<div id="dispBank">1000</div></div>
+        <div class="stat-card">Bank<div id="dispBank">5000</div></div>
         <div class="stat-card">P/L<div id="dispProfit">0</div></div>
         <div class="stat-card">L | H Bet<div id="dispUnits">20 | 20</div></div>
-        <div class="stat-card">Peak<div id="dispPeak">1000</div></div>
+        <div class="stat-card">Peak<div id="dispPeak">5000</div></div>
     </div>
 
     <div class="table-scroll-container">
@@ -59,7 +59,7 @@
     </div>
 
     <div id="advice" style="background:#444; padding:15px; text-align:center; border-radius:5px; font-weight:bold; margin-bottom:10px;">
-        WAITING FOR 18 SPINS
+        WAITING FOR 37 SPINS
     </div>
 
     <div class="sim-section">
@@ -78,12 +78,12 @@
 </div>
 
 <script>
-    let bank=1000, startBank=1000, peak=1000, history=[], base=20, active=false;
+    let bank=5000, startBank=5000, peak=5000, history=[], base=20, active=false;
     let progLow=1, progHigh=1, lossLow=0, lossHigh=0, currentPrediction=null;
     let states = [];
 
     function startSession() {
-        startBank = parseFloat(document.getElementById('inBank').value) || 1000;
+        startBank = parseFloat(document.getElementById('inBank').value) || 5000;
         base = parseFloat(document.getElementById('inUnit').value) || 20;
         bank = startBank; peak = bank; progLow = 1; progHigh = 1; lossLow = 0; lossHigh = 0;
         active = true; history = []; currentPrediction = null;
@@ -125,8 +125,8 @@
         }
 
         history.push(n);
-        if(history.length >= 18) {
-            const last18 = history.slice(-18);
+        if(history.length >= 37) {
+            const last18 = history.slice(-37);
             const freq = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0};
             last18.forEach(x => { if(x > 0) freq[Math.ceil(x/6)]++; });
             
@@ -159,8 +159,8 @@
                 if(hit) sWins++;
             }
             sHist.push(n);
-            if(sHist.length >= 18) {
-                const l18 = sHist.slice(-18);
+            if(sHist.length >= 37) {
+                const l18 = sHist.slice(-37);
                 const f = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0};
                 l18.forEach(x => { if(x > 0) f[Math.ceil(x/6)]++; });
                 const lS = [1,2,3].sort((a,b) => f[b] - f[a]);
