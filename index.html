@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Hottest DS Tracker</title>
+    <title>Roulette Hottest DS 16-Spin Tracker</title>
     <style>
         :root { --green: #1b5e20; --red: #d32f2f; --black: #1a1a1a; --gold: #ffc107; --blue: #2196f3; }
         body { font-family: -apple-system, sans-serif; background: #121212; color: white; margin: 0; padding: 10px; }
@@ -32,7 +32,7 @@
         <div style="display:flex; gap:10px;">
             <div class="input-group">
                 <label>Bankroll ($)</label>
-                <input type="number" id="inBank" value="5000">
+                <input type="number" id="inBank" value="1000">
             </div>
             <div class="input-group">
                 <label>Base Unit ($)</label>
@@ -43,10 +43,10 @@
     </div>
 
     <div class="stats">
-        <div class="stat-card">Bank<div id="dispBank">5000</div></div>
+        <div class="stat-card">Bank<div id="dispBank">1000</div></div>
         <div class="stat-card">P/L<div id="dispProfit">0</div></div>
         <div class="stat-card">L | H Bet<div id="dispUnits">20 | 20</div></div>
-        <div class="stat-card">Peak<div id="dispPeak">5000</div></div>
+        <div class="stat-card">Peak<div id="dispPeak">1000</div></div>
     </div>
 
     <div class="table-scroll-container">
@@ -54,17 +54,17 @@
             <div class="cell zero" onclick="press(0)">0</div>
             <div class="cell r" onclick="press(3)">3</div><div class="cell b" onclick="press(6)">6</div><div class="cell r" onclick="press(9)">9</div><div class="cell r" onclick="press(12)">12</div><div class="cell b" onclick="press(15)">15</div><div class="cell r" onclick="press(18)">18</div><div class="cell r" onclick="press(21)">21</div><div class="cell b" onclick="press(24)">24</div><div class="cell r" onclick="press(27)">27</div><div class="cell r" onclick="press(30)">30</div><div class="cell b" onclick="press(33)">33</div><div class="cell r" onclick="press(36)">36</div>
             <div class="cell b" onclick="press(2)" style="grid-column: 2">2</div><div class="cell r" onclick="press(5)">5</div><div class="cell b" onclick="press(8)">8</div><div class="cell b" onclick="press(11)">11</div><div class="cell r" onclick="press(14)">14</div><div class="cell b" onclick="press(17)">17</div><div class="cell b" onclick="press(20)">20</div><div class="cell r" onclick="press(23)">23</div><div class="cell b" onclick="press(26)">26</div><div class="cell b" onclick="press(29)">29</div><div class="cell r" onclick="press(32)">32</div><div class="cell b" onclick="press(35)">35</div>
-            <div class="cell r" onclick="press(1)" style="grid-column: 2">1</div><div class="cell b" onclick="press(4)">4</div><div class="cell r" onclick="press(7)">7</div><div class="cell b" onclick="press(10)">10</div><div class="cell b" onclick="press(13)">13</div><div class="cell r" onclick="press(16)">16</div><div class="cell r" onclick="press(19)">19</div><div class="cell b" onclick="press(22)">22</div><div class="cell r" onclick="press(25)">25</div><div class="cell b" onclick="press(28)">28</div><div class="cell b" onclick="symbol:31">31</div><div class="cell r" onclick="press(34)">34</div>
+            <div class="cell r" onclick="press(1)" style="grid-column: 2">1</div><div class="cell b" onclick="press(4)">4</div><div class="cell r" onclick="press(7)">7</div><div class="cell b" onclick="press(10)">10</div><div class="cell b" onclick="press(13)">13</div><div class="cell r" onclick="press(16)">16</div><div class="cell r" onclick="press(19)">19</div><div class="cell b" onclick="press(22)">22</div><div class="cell r" onclick="press(25)">25</div><div class="cell b" onclick="press(28)">28</div><div class="cell b" onclick="press(31)">31</div><div class="cell r" onclick="press(34)">34</div>
         </div>
     </div>
 
     <div id="advice" style="background:#444; padding:15px; text-align:center; border-radius:5px; font-weight:bold; margin-bottom:10px;">
-        WAITING FOR 19 SPINS
+        WAITING FOR 16 SPINS
     </div>
 
     <div class="sim-section">
-        <label style="color:var(--gold); font-size:0.8rem;">SIMULATION (Hottest DS Strategy)</label>
-        <textarea id="simData" rows="3" placeholder="Paste numbers here..."></textarea>
+        <label style="color:var(--gold); font-size:0.8rem;">SIMULATION (Hottest DS 16-Spin Window)</label>
+        <textarea id="simData" rows="3" placeholder="Paste data (200-1000 numbers)..."></textarea>
         <button class="btn" style="background:var(--blue); width:100%; margin-top:10px; color:white;" onclick="runSimulation()">Run Full Simulation</button>
         <div id="simResults" style="margin-top:10px; font-size:0.85rem; color:#bdc3c7;"></div>
     </div>
@@ -78,16 +78,16 @@
 </div>
 
 <script>
-    let bank=5000, startBank=5000, peak=5000, history=[], base=20, active=false;
+    let bank=1000, startBank=1000, peak=1000, history=[], base=20, active=false;
     let progLow=1, progHigh=1, lossLow=0, lossHigh=0, currentPrediction=null;
     let states = [];
 
     function startSession() {
-        startBank = parseFloat(document.getElementById('inBank').value) || 5000;
+        startBank = parseFloat(document.getElementById('inBank').value) || 1000;
         base = parseFloat(document.getElementById('inUnit').value) || 20;
         bank = startBank; peak = bank; progLow = 1; progHigh = 1; lossLow = 0; lossHigh = 0;
         active = true; history = []; currentPrediction = null;
-        document.getElementById('log').innerHTML = "Session Started (Hottest DS Mode)...";
+        document.getElementById('log').innerHTML = "Session Started (Hottest 16-Spin Window)...";
         updateUI();
     }
 
@@ -101,10 +101,10 @@
     function processSpin(n) {
         if(currentPrediction) {
             bank -= (progLow * base) + (progHigh * base);
-            let ds = Math.ceil(n / 6);
+            let dsHit = Math.ceil(n / 6);
 
-            // Side 1 (1-18)
-            if(n > 0 && n <= 18 && ds === currentPrediction.lowDS) {
+            // Logic Low Side (1-18)
+            if(n > 0 && n <= 18 && dsHit === currentPrediction.lowDS) {
                 bank += (progLow * base * 6);
                 progLow = Math.max(1, progLow - 2);
                 lossLow = 0;
@@ -113,8 +113,8 @@
                 if(lossLow >= 2) { progLow += 1; lossLow = 0; }
             }
 
-            // Side 2 (19-36)
-            if(n >= 19 && ds === currentPrediction.highDS) {
+            // Logic High Side (19-36)
+            if(n >= 19 && dsHit === currentPrediction.highDS) {
                 bank += (progHigh * base * 6);
                 progHigh = Math.max(1, progHigh - 2);
                 lossHigh = 0;
@@ -125,12 +125,12 @@
         }
 
         history.push(n);
-        if(history.length >= 19) {
-            const last18 = history.slice(-19);
+        if(history.length >= 16) {
+            const last16 = history.slice(-16);
             const freq = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0};
-            last18.forEach(x => { if(x > 0) freq[Math.ceil(x/6)]++; });
+            last16.forEach(x => { if(x > 0) freq[Math.ceil(x/6)]++; });
             
-            // Sort by frequency (Descending for Hottest)
+            // Hottest = Most frequent
             const lowSet = [1,2,3].sort((a,b) => freq[b] - freq[a]);
             const highSet = [4,5,6].sort((a,b) => freq[b] - freq[a]);
             currentPrediction = { lowDS: lowSet[0], highDS: highSet[0] };
@@ -140,7 +140,7 @@
     function runSimulation() {
         const raw = document.getElementById('simData').value;
         const nums = raw.split(/[\s,]+/).filter(x => x !== "").map(Number);
-        if(nums.length < 19) { alert("Need at least 19 numbers"); return; }
+        if(nums.length < 17) { alert("Need at least 17 numbers for sim"); return; }
 
         let sBank = parseFloat(document.getElementById('inBank').value);
         let sBase = parseFloat(document.getElementById('inUnit').value);
@@ -150,19 +150,19 @@
             if(sPred) {
                 sBets++;
                 sBank -= (sPL * sBase) + (sPH * sBase);
-                let ds = Math.ceil(n/6);
+                let dsHit = Math.ceil(n/6);
                 let hit = false;
-                if(n > 0 && n <= 18 && ds === sPred.lowDS) { sBank += (sPL * sBase * 6); sPL = Math.max(1, sPL - 2); sLL = 0; hit=true; }
+                if(n > 0 && n <= 18 && dsHit === sPred.lowDS) { sBank += (sPL * sBase * 6); sPL = Math.max(1, sPL - 2); sLL = 0; hit=true; }
                 else { sLL++; if(sLL >= 2){ sPL++; sLL=0; } }
-                if(n >= 19 && ds === sPred.highDS) { sBank += (sPH * sBase * 6); sPH = Math.max(1, sPH - 2); sLH = 0; hit=true; }
+                if(n >= 19 && dsHit === sPred.highDS) { sBank += (sPH * sBase * 6); sPH = Math.max(1, sPH - 2); sLH = 0; hit=true; }
                 else { sLH++; if(sLH >= 2){ sPH++; sLH=0; } }
                 if(hit) sWins++;
             }
             sHist.push(n);
-            if(sHist.length >= 19) {
-                const l18 = sHist.slice(-19);
+            if(sHist.length >= 16) {
+                const l16 = sHist.slice(-16);
                 const f = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0};
-                l18.forEach(x => { if(x > 0) f[Math.ceil(x/6)]++; });
+                l16.forEach(x => { if(x > 0) f[Math.ceil(x/6)]++; });
                 const lS = [1,2,3].sort((a,b) => f[b] - f[a]);
                 const hS = [4,5,6].sort((a,b) => f[b] - f[a]);
                 sPred = { lowDS: lS[0], highDS: hS[0] };
@@ -173,8 +173,9 @@
         });
 
         document.getElementById('simResults').innerHTML = `
-            <b>Final:</b> $${Math.floor(sBank)} | <b>Max Profit:</b> $${Math.floor(sPeak - parseFloat(document.getElementById('inBank').value))}<br>
-            <b>Max DD:</b> <span style="color:#e74c3c">$${Math.floor(sMaxDD)}</span> | <b>Win Rate:</b> ${((sWins/sBets)*100).toFixed(1)}%
+            <b>Final:</b> $${Math.floor(sBank)} | <b>Profit:</b> $${Math.floor(sBank - parseFloat(document.getElementById('inBank').value))}<br>
+            <b>Max Peak:</b> $${Math.floor(sPeak)} | <b>Max DD:</b> <span style="color:#e74c3c">$${Math.floor(sMaxDD)}</span><br>
+            <b>Wins:</b> ${sWins}/${sBets} (${((sWins/sBets)*100).toFixed(1)}%)
         `;
     }
 
@@ -211,8 +212,11 @@
             };
             place(currentPrediction.lowDS, progLow, 'low');
             place(currentPrediction.highDS, progHigh, 'high');
-            document.getElementById('advice').innerText = `BET HOTTEST: DS${currentPrediction.lowDS} & DS${currentPrediction.highDS}`;
+            document.getElementById('advice').innerText = `BET HOTTEST (16-SPIN): DS${currentPrediction.lowDS} & DS${currentPrediction.highDS}`;
             document.getElementById('advice').style.background = "var(--blue)";
+        } else {
+            document.getElementById('advice').innerText = `SPINS TO START: ${16 - history.length}`;
+            document.getElementById('advice').style.background = "#444";
         }
 
         if(n !== undefined) {
