@@ -2,229 +2,195 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Hottest DS 16-Spin Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roulette Neighbor Predictor</title>
     <style>
-        :root { --green: #1b5e20; --red: #d32f2f; --black: #1a1a1a; --gold: #ffc107; --blue: #2196f3; }
-        body { font-family: -apple-system, sans-serif; background: #121212; color: white; margin: 0; padding: 10px; }
-        .header, .sim-section { background: #2c3e50; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
-        .input-group { flex: 1 1 140px; display: flex; flex-direction: column; margin-bottom: 10px; }
-        .input-group label { font-size: 0.8rem; margin-bottom: 4px; color: var(--gold); }
-        input, textarea { padding: 12px; border-radius: 4px; border: 2px solid #555; background: white; color: black; font-weight: bold; }
-        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 10px; }
-        .stat-card { background: #34495e; padding: 10px; border-radius: 6px; text-align: center; font-size: 0.8rem; }
-        .stat-card div { font-size: 1.1rem; color: var(--gold); font-weight: bold; }
-        .table-scroll-container { overflow-x: auto; background: var(--green); padding: 15px; border: 4px solid #3e2723; border-radius: 12px; margin-bottom: 10px; }
-        .roulette-grid { display: grid; grid-template-columns: 80px repeat(12, 65px); grid-template-rows: 60px 60px 60px 50px; gap: 4px; min-width: 880px; }
-        .cell { display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; border: 1px solid rgba(255,255,255,0.4); font-size: 1.4rem; border-radius: 4px; }
-        .zero { grid-row: 1 / span 3; background: var(--green); border: 3px solid white; }
-        .r { background: var(--red); } .b { background: var(--black); }
-        .physical-chip { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 900; color: white; border: 3px dashed white; background: #2980b9; justify-self: center; align-self: center; }
-        .chip-low { background: #c0392b; }
-        .btn { padding: 15px; border: none; border-radius: 4px; font-weight: bold; text-transform: uppercase; cursor: pointer; }
-        textarea { width: 100%; box-sizing: border-box; font-family: monospace; resize: vertical; margin-top: 5px; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 2px solid #c5a059;
+        }
+
+        h2 { text-align: center; color: #c5a059; text-transform: uppercase; }
+
+        /* Mock Roulette Table Style */
+        .roulette-board {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 5px;
+            background: #004d26;
+            padding: 15px;
+            border-radius: 10px;
+            border: 5px solid #5d4037;
+            margin-bottom: 20px;
+        }
+
+        .cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255,255,255,0.2);
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .red { background-color: #e63946; }
+        .black { background-color: #000000; }
+        .green { background-color: #2b9348; grid-row: span 3; }
+
+        /* Inputs */
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        textarea, input {
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            background: #3d3d3d;
+            color: white;
+            font-size: 1rem;
+        }
+
+        button {
+            padding: 12px;
+            background: #c5a059;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover { background: #e2be7a; }
+
+        /* Results */
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #252525;
+            border-left: 5px solid #c5a059;
+        }
+
+        .prediction {
+            font-size: 1.5rem;
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .highlight { color: #ffcc00; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">
-        <div style="display:flex; gap:10px;">
-            <div class="input-group">
-                <label>Bankroll ($)</label>
-                <input type="number" id="inBank" value="1000">
-            </div>
-            <div class="input-group">
-                <label>Base Unit ($)</label>
-                <input type="number" id="inUnit" value="20">
-            </div>
+    <h2>Roulette Intelligence</h2>
+
+    <div class="roulette-board" id="board">
+        <div class="cell green">0</div>
         </div>
-        <button class="btn" style="background:var(--gold); width:100%; color:black;" onclick="startSession()">Apply & Start Session</button>
+
+    <div class="input-section">
+        <label>Step 1: Paste History (Space separated)</label>
+        <textarea id="historyInput" rows="3" placeholder="Example: 22 12 13 24 1 28 10 25 12 13 17 19 29"></textarea>
+
+        <label>Step 2: Enter Number to Search</label>
+        <input type="number" id="targetNumber" placeholder="e.g. 12">
+        
+        <button onclick="analyzeNeighbors()">Analyze & Predict</button>
     </div>
 
-    <div class="stats">
-        <div class="stat-card">Bank<div id="dispBank">1000</div></div>
-        <div class="stat-card">P/L<div id="dispProfit">0</div></div>
-        <div class="stat-card">L | H Bet<div id="dispUnits">20 | 20</div></div>
-        <div class="stat-card">Peak<div id="dispPeak">1000</div></div>
+    <div class="results" id="output">
+        <div>Neighbors Found: <span id="neighborList" class="highlight">-</span></div>
+        <div>Prediction: <span id="predictionResult" class="prediction">None</span></div>
     </div>
-
-    <div class="table-scroll-container">
-        <div class="roulette-grid" id="grid">
-            <div class="cell zero" onclick="press(0)">0</div>
-            <div class="cell r" onclick="press(3)">3</div><div class="cell b" onclick="press(6)">6</div><div class="cell r" onclick="press(9)">9</div><div class="cell r" onclick="press(12)">12</div><div class="cell b" onclick="press(15)">15</div><div class="cell r" onclick="press(18)">18</div><div class="cell r" onclick="press(21)">21</div><div class="cell b" onclick="press(24)">24</div><div class="cell r" onclick="press(27)">27</div><div class="cell r" onclick="press(30)">30</div><div class="cell b" onclick="press(33)">33</div><div class="cell r" onclick="press(36)">36</div>
-            <div class="cell b" onclick="press(2)" style="grid-column: 2">2</div><div class="cell r" onclick="press(5)">5</div><div class="cell b" onclick="press(8)">8</div><div class="cell b" onclick="press(11)">11</div><div class="cell r" onclick="press(14)">14</div><div class="cell b" onclick="press(17)">17</div><div class="cell b" onclick="press(20)">20</div><div class="cell r" onclick="press(23)">23</div><div class="cell b" onclick="press(26)">26</div><div class="cell b" onclick="press(29)">29</div><div class="cell r" onclick="press(32)">32</div><div class="cell b" onclick="press(35)">35</div>
-            <div class="cell r" onclick="press(1)" style="grid-column: 2">1</div><div class="cell b" onclick="press(4)">4</div><div class="cell r" onclick="press(7)">7</div><div class="cell b" onclick="press(10)">10</div><div class="cell b" onclick="press(13)">13</div><div class="cell r" onclick="press(16)">16</div><div class="cell r" onclick="press(19)">19</div><div class="cell b" onclick="press(22)">22</div><div class="cell r" onclick="press(25)">25</div><div class="cell b" onclick="press(28)">28</div><div class="cell b" onclick="press(31)">31</div><div class="cell r" onclick="press(34)">34</div>
-        </div>
-    </div>
-
-    <div id="advice" style="background:#444; padding:15px; text-align:center; border-radius:5px; font-weight:bold; margin-bottom:10px;">
-        WAITING FOR 16 SPINS
-    </div>
-
-    <div class="sim-section">
-        <label style="color:var(--gold); font-size:0.8rem;">SIMULATION (Hottest DS 16-Spin Window)</label>
-        <textarea id="simData" rows="3" placeholder="Paste data (200-1000 numbers)..."></textarea>
-        <button class="btn" style="background:var(--blue); width:100%; margin-top:10px; color:white;" onclick="runSimulation()">Run Full Simulation</button>
-        <div id="simResults" style="margin-top:10px; font-size:0.85rem; color:#bdc3c7;"></div>
-    </div>
-
-    <div style="display:flex; gap:10px;">
-        <button class="btn" style="background:#e67e22; flex:1" onclick="undo()">Undo</button>
-        <button class="btn" style="background:#7f8c8d; flex:1" onclick="location.reload()">Reset</button>
-    </div>
-
-    <div id="log" style="height:150px; overflow-y:auto; background:#1a1a1a; padding:10px; margin-top:10px; font-family:monospace; font-size:0.8rem; border:1px solid #333;"></div>
 </div>
 
 <script>
-    let bank=1000, startBank=1000, peak=1000, history=[], base=20, active=false;
-    let progLow=1, progHigh=1, lossLow=0, lossHigh=0, currentPrediction=null;
-    let states = [];
-
-    function startSession() {
-        startBank = parseFloat(document.getElementById('inBank').value) || 1000;
-        base = parseFloat(document.getElementById('inUnit').value) || 20;
-        bank = startBank; peak = bank; progLow = 1; progHigh = 1; lossLow = 0; lossHigh = 0;
-        active = true; history = []; currentPrediction = null;
-        document.getElementById('log').innerHTML = "Session Started (Hottest 16-Spin Window)...";
-        updateUI();
+    // Build the visual board numbers
+    const board = document.getElementById('board');
+    const reds = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+    for(let i=1; i<=36; i++) {
+        const div = document.createElement('div');
+        div.className = `cell ${reds.includes(i) ? 'red' : 'black'}`;
+        div.innerText = i;
+        board.appendChild(div);
     }
 
-    function press(n) {
-        if(!active) return;
-        saveState();
-        processSpin(n);
-        updateUI(n);
-    }
+    function analyzeNeighbors() {
+        const historyStr = document.getElementById('historyInput').value.trim();
+        const target = document.getElementById('targetNumber').value.trim();
+        const outputList = document.getElementById('neighborList');
+        const outputPred = document.getElementById('predictionResult');
 
-    function processSpin(n) {
-        if(currentPrediction) {
-            bank -= (progLow * base) + (progHigh * base);
-            let dsHit = Math.ceil(n / 6);
+        if (!historyStr || !target) {
+            alert("Please provide both history and a target number.");
+            return;
+        }
 
-            // Logic Low Side (1-18)
-            if(n > 0 && n <= 18 && dsHit === currentPrediction.lowDS) {
-                bank += (progLow * base * 6);
-                progLow = Math.max(1, progLow - 2);
-                lossLow = 0;
-            } else {
-                lossLow++;
-                if(lossLow >= 2) { progLow += 1; lossLow = 0; }
-            }
+        // Convert history string to array of numbers
+        const history = historyStr.split(/\s+/);
+        let neighbors = [];
 
-            // Logic High Side (19-36)
-            if(n >= 19 && dsHit === currentPrediction.highDS) {
-                bank += (progHigh * base * 6);
-                progHigh = Math.max(1, progHigh - 2);
-                lossHigh = 0;
-            } else {
-                lossHigh++;
-                if(lossHigh >= 2) { progHigh += 1; lossHigh = 0; }
+        // Loop through history to find target
+        for (let i = 0; i < history.length; i++) {
+            if (history[i] === target) {
+                // Get Left (if exists)
+                if (i > 0) neighbors.push(history[i - 1]);
+                // Get Right (if exists)
+                if (i < history.length - 1) neighbors.push(history[i + 1]);
             }
         }
 
-        history.push(n);
-        if(history.length >= 16) {
-            const last16 = history.slice(-16);
-            const freq = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0};
-            last16.forEach(x => { if(x > 0) freq[Math.ceil(x/6)]++; });
-            
-            // Hottest = Most frequent
-            const lowSet = [1,2,3].sort((a,b) => freq[b] - freq[a]);
-            const highSet = [4,5,6].sort((a,b) => freq[b] - freq[a]);
-            currentPrediction = { lowDS: lowSet[0], highDS: highSet[0] };
+        // Display neighbors
+        outputList.innerText = neighbors.length > 0 ? neighbors.join(", ") : "No neighbors found";
+
+        // Logic for Most Frequent (Prediction)
+        if (neighbors.length === 0) {
+            outputPred.innerText = "None";
+            return;
         }
-    }
 
-    function runSimulation() {
-        const raw = document.getElementById('simData').value;
-        const nums = raw.split(/[\s,]+/).filter(x => x !== "").map(Number);
-        if(nums.length < 17) { alert("Need at least 17 numbers for sim"); return; }
+        const counts = {};
+        let maxCount = 0;
+        let prediction = [];
 
-        let sBank = parseFloat(document.getElementById('inBank').value);
-        let sBase = parseFloat(document.getElementById('inUnit').value);
-        let sPL=1, sPH=1, sLL=0, sLH=0, sPeak=sBank, sMaxDD=0, sWins=0, sBets=0, sHist=[], sPred=null;
-
-        nums.forEach(n => {
-            if(sPred) {
-                sBets++;
-                sBank -= (sPL * sBase) + (sPH * sBase);
-                let dsHit = Math.ceil(n/6);
-                let hit = false;
-                if(n > 0 && n <= 18 && dsHit === sPred.lowDS) { sBank += (sPL * sBase * 6); sPL = Math.max(1, sPL - 2); sLL = 0; hit=true; }
-                else { sLL++; if(sLL >= 2){ sPL++; sLL=0; } }
-                if(n >= 19 && dsHit === sPred.highDS) { sBank += (sPH * sBase * 6); sPH = Math.max(1, sPH - 2); sLH = 0; hit=true; }
-                else { sLH++; if(sLH >= 2){ sPH++; sLH=0; } }
-                if(hit) sWins++;
+        neighbors.forEach(num => {
+            counts[num] = (counts[num] || 0) + 1;
+            if (counts[num] > maxCount) {
+                maxCount = counts[num];
             }
-            sHist.push(n);
-            if(sHist.length >= 16) {
-                const l16 = sHist.slice(-16);
-                const f = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0};
-                l16.forEach(x => { if(x > 0) f[Math.ceil(x/6)]++; });
-                const lS = [1,2,3].sort((a,b) => f[b] - f[a]);
-                const hS = [4,5,6].sort((a,b) => f[b] - f[a]);
-                sPred = { lowDS: lS[0], highDS: hS[0] };
-            }
-            if(sBank > sPeak) sPeak = sBank;
-            let dd = sPeak - sBank;
-            if(dd > sMaxDD) sMaxDD = dd;
         });
 
-        document.getElementById('simResults').innerHTML = `
-            <b>Final:</b> $${Math.floor(sBank)} | <b>Profit:</b> $${Math.floor(sBank - parseFloat(document.getElementById('inBank').value))}<br>
-            <b>Max Peak:</b> $${Math.floor(sPeak)} | <b>Max DD:</b> <span style="color:#e74c3c">$${Math.floor(sMaxDD)}</span><br>
-            <b>Wins:</b> ${sWins}/${sBets} (${((sWins/sBets)*100).toFixed(1)}%)
-        `;
-    }
-
-    function saveState() {
-        states.push(JSON.stringify({bank, progLow, progHigh, lossLow, lossHigh, history: [...history], currentPrediction}));
-    }
-
-    function undo() {
-        if(states.length === 0) return;
-        let s = JSON.parse(states.pop());
-        bank = s.bank; progLow = s.progLow; progHigh = s.progHigh;
-        lossLow = s.lossLow; lossHigh = s.lossHigh;
-        history = s.history; currentPrediction = s.currentPrediction;
-        updateUI();
-    }
-
-    function updateUI(n) {
-        document.getElementById('dispBank').innerText = Math.floor(bank);
-        document.getElementById('dispProfit').innerText = Math.floor(bank - startBank);
-        document.getElementById('dispUnits').innerText = `${progLow * base} | ${progHigh * base}`;
-        if(bank > peak) peak = bank;
-        document.getElementById('dispPeak').innerText = Math.floor(peak);
-        document.querySelectorAll('.physical-chip').forEach(c => c.remove());
-
-        if(currentPrediction) {
-            const grid = document.getElementById('grid');
-            const place = (ds, val, type) => {
-                const chip = document.createElement('div');
-                chip.className = `physical-chip ${type === 'low' ? 'chip-low' : ''}`;
-                chip.innerText = `$${val * base}`;
-                chip.style.gridColumn = `${((ds-1)*2)+2} / span 2`;
-                chip.style.gridRow = "4";
-                grid.appendChild(chip);
-            };
-            place(currentPrediction.lowDS, progLow, 'low');
-            place(currentPrediction.highDS, progHigh, 'high');
-            document.getElementById('advice').innerText = `BET HOTTEST (16-SPIN): DS${currentPrediction.lowDS} & DS${currentPrediction.highDS}`;
-            document.getElementById('advice').style.background = "var(--blue)";
+        // Only predict if count > 1
+        if (maxCount > 1) {
+            for (let num in counts) {
+                if (counts[num] === maxCount) prediction.push(num);
+            }
+            outputPred.innerText = prediction.join(", ");
         } else {
-            document.getElementById('advice').innerText = `SPINS TO START: ${16 - history.length}`;
-            document.getElementById('advice').style.background = "#444";
-        }
-
-        if(n !== undefined) {
-            const entry = document.createElement('div');
-            entry.innerHTML = `Spin ${history.length}: <b>${n}</b> | Bank: ${Math.floor(bank)}`;
-            document.getElementById('log').prepend(entry);
+            outputPred.innerText = "None (No repeats)";
         }
     }
 </script>
+
 </body>
 </html>
