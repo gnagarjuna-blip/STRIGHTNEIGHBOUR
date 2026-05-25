@@ -190,7 +190,7 @@
     function addNumber(n) {
         let current = historyInput.value.trim();
         historyInput.value = current ? current + " " + n : n;
-        targetInput.value = n; // Set the clicked number as the search target
+        targetInput.value = n; 
         calculate();
     }
 
@@ -214,14 +214,20 @@
         let neighbors = [];
         for (let i = 0; i < history.length; i++) {
             if (history[i] === target) {
-                if (i > 0) neighbors.push(history[i-1]);
-                if (i < history.length - 1) neighbors.push(history[i+1]);
+                if (i > 0) neighbors.push(parseInt(history[i-1], 10));
+                if (i < history.length - 1) neighbors.push(parseInt(history[i+1], 10));
             }
         }
 
-        neighborDisplay.innerText = neighbors.length > 0 ? neighbors.join(", ") : "None";
+        if (neighbors.length > 0) {
+            // Sort standard JavaScript array numerically in ascending order
+            const sortedNeighbors = [...neighbors].sort((a, b) => a - b);
+            neighborDisplay.innerText = sortedNeighbors.join(", ");
+        } else {
+            neighborDisplay.innerText = "None";
+        }
 
-        // Frequency Logic
+        // Frequency Logic (uses original un-sorted list for accurate tracking)
         const counts = {};
         let topNum = null;
         let maxCount = 0;
@@ -234,7 +240,6 @@
             }
         });
 
-        // Show prediction only if it appears more than once
         if (maxCount > 1) {
             predDisplay.innerText = topNum;
         } else {
